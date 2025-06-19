@@ -24,9 +24,9 @@ A clean, scalable Selenium WebDriver automation framework built with Java 21, Ma
 
 Verify installation:
 
-```bash
+```
 java -version
-
+```
 
 2️⃣ Install Maven
 Download and install from:
@@ -34,13 +34,13 @@ https://maven.apache.org/download.cgi
 
 Verify installation:
 
-```bash
+```
 mvn -version
-
+```
 How to Execute Tests
 Run all tests via Maven:
 
-```bash
+```
 mvn clean test
-
+```
 
