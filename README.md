@@ -37,7 +37,7 @@ Verify installation:
 ```
 mvn -version
 ```
-How to Execute Tests
+Execute Tests
 Run all tests via Maven:
 
 ```
