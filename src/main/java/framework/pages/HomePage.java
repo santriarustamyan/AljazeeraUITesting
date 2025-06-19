@@ -3,12 +3,13 @@ package framework.pages;
 import framework.base.BasePage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+
 public class HomePage extends BasePage {
 
     public HomePage(WebDriver driver) {
         super(driver);
     }
-    
+
     public enum MainMenu {
         NEWS("//a[@href='/news/']"),
         MIDDLE_EAST("//a[@href='/middle-east/']"),
@@ -16,11 +17,18 @@ public class HomePage extends BasePage {
         OPINION("//a[@href='/opinion/']"),
         SPORT("//a[@href='/sports/']"),
         VIDEO("//a[@href='/videos/']"),
-        MORE("//button[text()='More']");
+        MORE("//button[text()='More']"),
+        LIVE("//div[@class='site-header__live-cta']//a[@href='/live']");;
 
         private final String xpath;
-        MainMenu(String xpath) { this.xpath = xpath; }
-        public By getLocator() { return By.xpath(xpath); }
+
+        MainMenu(String xpath) {
+            this.xpath = xpath;
+        }
+
+        public By getLocator() {
+            return By.xpath(xpath);
+        }
     }
 
     public enum NewsSubMenu {
@@ -32,11 +40,16 @@ public class HomePage extends BasePage {
         ASIA_PACIFIC("//a[@href='/asia-pacific/']");
 
         private final String xpath;
-        NewsSubMenu(String xpath) { this.xpath = xpath; }
-        public By getLocator() { return By.xpath(xpath); }
+
+        NewsSubMenu(String xpath) {
+            this.xpath = xpath;
+        }
+
+        public By getLocator() {
+            return By.xpath(xpath);
+        }
     }
 
-    // More submenu Enum
     public enum MoreSubMenu {
         FEATURES("//a[@href='/features/']"),
         ECONOMY("//a[@href='/economy/']"),
@@ -49,11 +62,16 @@ public class HomePage extends BasePage {
         PODCASTS("//a[@href='/audio/podcasts']");
 
         private final String xpath;
-        MoreSubMenu(String xpath) { this.xpath = xpath; }
-        public By getLocator() { return By.xpath(xpath); }
+
+        MoreSubMenu(String xpath) {
+            this.xpath = xpath;
+        }
+
+        public By getLocator() {
+            return By.xpath(xpath);
+        }
     }
 
-    // Actions for MainMenu
     public void clickMainMenu(MainMenu menu) {
         click(menu.getLocator());
     }
@@ -62,7 +80,6 @@ public class HomePage extends BasePage {
         return getText(menu.getLocator());
     }
 
-    // Actions for NewsSubMenu
     public void clickNewsSubMenu(NewsSubMenu subMenu) {
         click(subMenu.getLocator());
     }
@@ -71,7 +88,6 @@ public class HomePage extends BasePage {
         return getText(subMenu.getLocator());
     }
 
-    // Actions for MoreSubMenu
     public void clickMoreSubMenu(MoreSubMenu subMenu) {
         click(subMenu.getLocator());
     }

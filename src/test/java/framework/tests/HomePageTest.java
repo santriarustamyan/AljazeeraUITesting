@@ -1,5 +1,6 @@
-package tests;
+package framework.tests;
 
+import framework.config.ConfigReader;
 import framework.driver.DriverFactory;
 import framework.pages.HomePage;
 import org.openqa.selenium.WebDriver;
@@ -14,7 +15,7 @@ public class HomePageTest {
     @BeforeMethod
     public void setup() {
         driver = DriverFactory.getDriver();
-        driver.get("https://your-test-url.com"); // Укажи сюда свой URL
+        driver.get(ConfigReader.get("base.url"));
         homePage = new HomePage(driver);
     }
 
@@ -22,7 +23,6 @@ public class HomePageTest {
     public void verifyMainAndSubMenus() {
         SoftAssert softAssert = new SoftAssert();
 
-        // Проверка Main Menu
         softAssert.assertEquals(homePage.getMainMenuText(HomePage.MainMenu.NEWS), "News");
         softAssert.assertEquals(homePage.getMainMenuText(HomePage.MainMenu.MIDDLE_EAST), "Middle East");
         softAssert.assertEquals(homePage.getMainMenuText(HomePage.MainMenu.EXPLAINED), "Explained");
@@ -31,7 +31,6 @@ public class HomePageTest {
         softAssert.assertEquals(homePage.getMainMenuText(HomePage.MainMenu.VIDEO), "Video");
         softAssert.assertEquals(homePage.getMainMenuText(HomePage.MainMenu.MORE), "More");
 
-        // Кликаем по News и проверяем News SubMenu
         homePage.clickMainMenu(HomePage.MainMenu.NEWS);
         softAssert.assertEquals(homePage.getNewsSubMenuText(HomePage.NewsSubMenu.AFRICA), "Africa");
         softAssert.assertEquals(homePage.getNewsSubMenuText(HomePage.NewsSubMenu.ASIA), "Asia");
@@ -40,7 +39,6 @@ public class HomePageTest {
         softAssert.assertEquals(homePage.getNewsSubMenuText(HomePage.NewsSubMenu.EUROPE), "Europe");
         softAssert.assertEquals(homePage.getNewsSubMenuText(HomePage.NewsSubMenu.ASIA_PACIFIC), "Asia Pacific");
 
-        // Кликаем по More и проверяем More SubMenu
         homePage.clickMainMenu(HomePage.MainMenu.MORE);
         softAssert.assertEquals(homePage.getMoreSubMenuText(HomePage.MoreSubMenu.FEATURES), "Features");
         softAssert.assertEquals(homePage.getMoreSubMenuText(HomePage.MoreSubMenu.ECONOMY), "Economy");
