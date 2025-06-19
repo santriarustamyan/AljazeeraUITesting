@@ -1,21 +1,46 @@
-# Aljazeera UI Testing Automation Framework
+# Selenium Test Automation Framework
 
-This project is a simple Selenium-based UI Automation Framework for testing the Aljazeera website.  
-The framework is built with Java, Selenium WebDriver, TestNG and follows the Page Object Model (POM) design pattern.
+A clean, scalable Selenium WebDriver automation framework built with Java 21, Maven, and TestNG. The framework follows the Page Object Model (POM) design pattern for better maintainability, scalability, and reusability.
 
 ---
 
-## Technologies Used
+## 🚀 Technologies Used
 
 - Java 21
-- Selenium WebDriver
-- TestNG
-- Maven
+- Maven 3.9.10
+- Selenium WebDriver 4.33.0
+- TestNG 7.11.0
+- SLF4J Logging
 - Page Object Model (POM)
-- WebDriverManager
-- SLF4J (Logging)
 
 ---
 
-## Project Structure
+## 🖥 Prerequisites
+
+### 1️⃣ Install Java JDK 21
+
+- Download and install from:  
+  https://www.oracle.com/java/technologies/downloads/
+
+Verify installation:
+
+```bash
+java -version
+
+
+2️⃣ Install Maven
+Download and install from:
+https://maven.apache.org/download.cgi
+
+Verify installation:
+
+```bash
+mvn -version
+
+How to Execute Tests
+Run all tests via Maven:
+
+```bash
+mvn clean test
+
 
