@@ -1,0 +1,62 @@
+package tests;
+
+import framework.driver.DriverFactory;
+import framework.pages.HomePage;
+import org.openqa.selenium.WebDriver;
+import org.testng.annotations.*;
+import org.testng.asserts.SoftAssert;
+
+public class HomePageTest {
+
+    private WebDriver driver;
+    private HomePage homePage;
+
+    @BeforeMethod
+    public void setup() {
+        driver = DriverFactory.getDriver();
+        driver.get("https://your-test-url.com"); // Укажи сюда свой URL
+        homePage = new HomePage(driver);
+    }
+
+    @Test
+    public void verifyMainAndSubMenus() {
+        SoftAssert softAssert = new SoftAssert();
+
+        // Проверка Main Menu
+        softAssert.assertEquals(homePage.getMainMenuText(HomePage.MainMenu.NEWS), "News");
+        softAssert.assertEquals(homePage.getMainMenuText(HomePage.MainMenu.MIDDLE_EAST), "Middle East");
+        softAssert.assertEquals(homePage.getMainMenuText(HomePage.MainMenu.EXPLAINED), "Explained");
+        softAssert.assertEquals(homePage.getMainMenuText(HomePage.MainMenu.OPINION), "Opinion");
+        softAssert.assertEquals(homePage.getMainMenuText(HomePage.MainMenu.SPORT), "Sport");
+        softAssert.assertEquals(homePage.getMainMenuText(HomePage.MainMenu.VIDEO), "Video");
+        softAssert.assertEquals(homePage.getMainMenuText(HomePage.MainMenu.MORE), "More");
+
+        // Кликаем по News и проверяем News SubMenu
+        homePage.clickMainMenu(HomePage.MainMenu.NEWS);
+        softAssert.assertEquals(homePage.getNewsSubMenuText(HomePage.NewsSubMenu.AFRICA), "Africa");
+        softAssert.assertEquals(homePage.getNewsSubMenuText(HomePage.NewsSubMenu.ASIA), "Asia");
+        softAssert.assertEquals(homePage.getNewsSubMenuText(HomePage.NewsSubMenu.US_CANADA), "US & Canada");
+        softAssert.assertEquals(homePage.getNewsSubMenuText(HomePage.NewsSubMenu.LATIN_AMERICA), "Latin America");
+        softAssert.assertEquals(homePage.getNewsSubMenuText(HomePage.NewsSubMenu.EUROPE), "Europe");
+        softAssert.assertEquals(homePage.getNewsSubMenuText(HomePage.NewsSubMenu.ASIA_PACIFIC), "Asia Pacific");
+
+        // Кликаем по More и проверяем More SubMenu
+        homePage.clickMainMenu(HomePage.MainMenu.MORE);
+        softAssert.assertEquals(homePage.getMoreSubMenuText(HomePage.MoreSubMenu.FEATURES), "Features");
+        softAssert.assertEquals(homePage.getMoreSubMenuText(HomePage.MoreSubMenu.ECONOMY), "Economy");
+        softAssert.assertEquals(homePage.getMoreSubMenuText(HomePage.MoreSubMenu.HUMAN_RIGHTS), "Human Rights");
+        softAssert.assertEquals(homePage.getMoreSubMenuText(HomePage.MoreSubMenu.CLIMATE_CRISIS), "Climate Crisis");
+        softAssert.assertEquals(homePage.getMoreSubMenuText(HomePage.MoreSubMenu.INVESTIGATIONS), "Investigations");
+        softAssert.assertEquals(homePage.getMoreSubMenuText(HomePage.MoreSubMenu.INTERACTIVES), "Interactives");
+        softAssert.assertEquals(homePage.getMoreSubMenuText(HomePage.MoreSubMenu.IN_PICTURES), "In Pictures");
+        softAssert.assertEquals(homePage.getMoreSubMenuText(HomePage.MoreSubMenu.SCIENCE_TECHNOLOGY), "Science & Technology");
+        softAssert.assertEquals(homePage.getMoreSubMenuText(HomePage.MoreSubMenu.PODCASTS), "Podcasts");
+
+        softAssert.assertAll();
+    }
+
+    @AfterMethod
+    public void tearDown() {
+        DriverFactory.quitDriver();
+    }
+}
