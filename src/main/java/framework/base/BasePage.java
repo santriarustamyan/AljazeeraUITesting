@@ -15,7 +15,7 @@ public abstract class BasePage {
 
     public BasePage(WebDriver driver) {
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(15));
     }
 
     protected WebElement waitForVisibility(By locator) {
@@ -26,15 +26,29 @@ public abstract class BasePage {
         return wait.until(ExpectedConditions.elementToBeClickable(locator));
     }
 
-    protected void click(By locator) {
-        waitForClickability(locator).click();
+    public void waitForInvisibility(By locator) {
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(locator));
+    }
+
+    protected void safeClick(By locator) {
+
+        waitForOverlayToDisappear();
+
+        wait.until(ExpectedConditions.presenceOfElementLocated(locator));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+        wait.until(ExpectedConditions.elementToBeClickable(locator));
+
+        driver.findElement(locator).click();
+    }
+
+    public void waitForOverlayToDisappear() {
+        By overlayLocator = By.cssSelector(".your-overlay-class");
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(overlayLocator));
     }
 
     protected String getText(By locator) {
         return waitForVisibility(locator).getText();
     }
-
-
 
     public boolean isDisplayed(By locator) {
         try {
@@ -50,11 +64,4 @@ public abstract class BasePage {
         element.sendKeys(text);
     }
 
-    protected void waitForUrlContains(String partialUrl) {
-        wait.until(ExpectedConditions.urlContains(partialUrl));
-    }
-
-    public void waitForInvisibility(By locator) {
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(locator));
-    }
 }

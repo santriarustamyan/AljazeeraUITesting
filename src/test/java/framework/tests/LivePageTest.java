@@ -1,6 +1,6 @@
 package framework.tests;
 
-import framework.config.ConfigReader;
+import framework.config.Config;
 import framework.driver.DriverFactory;
 import framework.pages.HomePage;
 import framework.pages.LivePage;
@@ -21,7 +21,7 @@ public class LivePageTest {
     @BeforeMethod
     public void setup() {
         driver = DriverFactory.getDriver();
-        driver.get(ConfigReader.get("base.url"));
+        driver.get(Config.get("base.url"));
         homePage = new HomePage(driver);
     }
 

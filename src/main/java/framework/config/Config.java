@@ -7,9 +7,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-public class ConfigReader {
+public class Config {
 
-    private static final Logger logger = LoggerFactory.getLogger(ConfigReader.class);
+    private static final Logger logger = LoggerFactory.getLogger(Config.class);
     private static final Properties properties = new Properties();
 
     static {
@@ -28,5 +28,13 @@ public class ConfigReader {
 
     public static boolean getBoolean(String key) {
         return Boolean.parseBoolean(properties.getProperty(key));
+    }
+
+    public static String getMailSlurpApiKey() {
+        String key = System.getenv("MAILSLURP_API_KEY");
+        if (key == null) {
+            throw new RuntimeException("MAILSLURP_API_KEY env variable is not set");
+        }
+        return key;
     }
 }

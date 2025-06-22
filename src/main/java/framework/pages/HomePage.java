@@ -18,7 +18,8 @@ public class HomePage extends BasePage {
         SPORT("//a[@href='/sports/']"),
         VIDEO("//a[@href='/videos/']"),
         MORE("//button[text()='More']"),
-        LIVE("//div[@class='site-header__live-cta']//a[@href='/live']");;
+        LIVE("//div[@class='site-header__live-cta']//a[@href='/live']"),
+        SIGNUP("//div[@class='site-header__account']//button[@id='user-accounts-tooltip']");
 
         private final String xpath;
 
@@ -73,7 +74,7 @@ public class HomePage extends BasePage {
     }
 
     public void clickMainMenu(MainMenu menu) {
-        click(menu.getLocator());
+        safeClick(menu.getLocator());
     }
 
     public String getMainMenuText(MainMenu menu) {
@@ -81,7 +82,7 @@ public class HomePage extends BasePage {
     }
 
     public void clickNewsSubMenu(NewsSubMenu subMenu) {
-        click(subMenu.getLocator());
+        safeClick(subMenu.getLocator());
     }
 
     public String getNewsSubMenuText(NewsSubMenu subMenu) {
@@ -89,11 +90,10 @@ public class HomePage extends BasePage {
     }
 
     public void clickMoreSubMenu(MoreSubMenu subMenu) {
-        click(subMenu.getLocator());
+        safeClick(subMenu.getLocator());
     }
 
     public String getMoreSubMenuText(MoreSubMenu subMenu) {
         return getText(subMenu.getLocator());
     }
 }
-

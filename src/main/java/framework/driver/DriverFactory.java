@@ -1,6 +1,6 @@
 package framework.driver;
 
-import framework.config.ConfigReader;
+import framework.config.Config;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.WebDriver;
@@ -23,7 +23,7 @@ public class DriverFactory {
             options.addArguments("--no-sandbox");
             options.addArguments("--disable-dev-shm-usage");
 
-            if (ConfigReader.getBoolean("headless")) {
+            if (Config.getBoolean("headless")) {
                 options.addArguments("--headless=new");
                 options.addArguments("--window-size=1920,1080");
             } else {
@@ -32,7 +32,7 @@ public class DriverFactory {
 
             driver = new ChromeDriver(options);
 
-            if (!ConfigReader.getBoolean("headless")) {
+            if (!Config.getBoolean("headless")) {
                 driver.manage().window().maximize();
             } else {
                 driver.manage().window().setSize(new Dimension(1920, 1080));
