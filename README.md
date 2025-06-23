@@ -44,3 +44,47 @@ Run all tests via Maven:
 mvn clean test
 ```
 
+## 📩 MailSlurp Setup
+The project uses MailSlurp to handle temporary email creation for testing purposes.
+
+Steps:
+Go to MailSlurp.
+
+Create a free account.
+
+Navigate to API Keys in your MailSlurp dashboard.
+
+Generate a new API Key.
+
+### Create .env file
+Inside the project root folder, create a file called .env:
+
+```
+touch .env
+```
+Add your MailSlurp API Key inside .env:
+
+```
+MAILSLURP_API_KEY=your_generated_api_key_here
+```
+⚠ Important: Do not commit your .env file to any public repository.
+
+## ▶️ How to Run Tests
+In the project root directory, execute:
+
+```
+mvn clean test
+```
+
+Tests will automatically download the required ChromeDriver version using WebDriverManager.
+
+By default, tests run in headless mode (browser will not open).
+
+### 🖥 If you want to run tests with visible browser window:
+1.Open DriverFactory.java.
+
+2.Set the headless property to false:
+
+```
+headless=false
+```
