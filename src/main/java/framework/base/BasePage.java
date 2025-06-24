@@ -1,11 +1,8 @@
 package framework.base;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
 import java.time.Duration;
 
 public abstract class BasePage {
@@ -16,6 +13,38 @@ public abstract class BasePage {
     public BasePage(WebDriver driver) {
         this.driver = driver;
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(30));
+    }
+
+    protected void safeClick(By locator) {
+        waitForOverlayToDisappear();
+
+        WebElement element = wait.until(ExpectedConditions.presenceOfElementLocated(locator));
+        scrollIntoView(element);
+        wait.until(ExpectedConditions.elementToBeClickable(element));
+
+        try {
+            element.click();
+        } catch (ElementClickInterceptedException e) {
+            clickWithJS(element);
+        }
+    }
+
+
+    protected void scrollIntoView(WebElement element) {
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", element);
+    }
+
+    protected void clickWithJS(WebElement element) {
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
+    }
+
+    public void waitForOverlayToDisappear() {
+        By overlayLocator = By.cssSelector(".your-overlay-class");
+        try {
+            wait.until(ExpectedConditions.invisibilityOfElementLocated(overlayLocator));
+        } catch (TimeoutException ignored) {
+            // игнорируем если overlay не появляется
+        }
     }
 
     protected WebElement waitForVisibility(By locator) {
@@ -30,22 +59,6 @@ public abstract class BasePage {
         wait.until(ExpectedConditions.invisibilityOfElementLocated(locator));
     }
 
-    protected void safeClick(By locator) {
-
-        waitForOverlayToDisappear();
-
-        wait.until(ExpectedConditions.presenceOfElementLocated(locator));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
-        wait.until(ExpectedConditions.elementToBeClickable(locator));
-
-        driver.findElement(locator).click();
-    }
-
-    public void waitForOverlayToDisappear() {
-        By overlayLocator = By.cssSelector(".your-overlay-class");
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(overlayLocator));
-    }
-
     protected String getText(By locator) {
         return waitForVisibility(locator).getText();
     }
@@ -53,7 +66,7 @@ public abstract class BasePage {
     public boolean isDisplayed(By locator) {
         try {
             return wait.until(ExpectedConditions.visibilityOfElementLocated(locator)).isDisplayed();
-        } catch (Exception e) {
+        } catch (TimeoutException e) {
             return false;
         }
     }
@@ -64,4 +77,22 @@ public abstract class BasePage {
         element.sendKeys(text);
     }
 
+    public void switchToNewTab() {
+        String currentHandle = driver.getWindowHandle();
+        for (String handle : driver.getWindowHandles()) {
+            if (!handle.equals(currentHandle)) {
+                driver.switchTo().window(handle);
+                break;
+            }
+        }
+    }
+
+    public void switchToMainTab() {
+        String mainHandle = driver.getWindowHandles().iterator().next();
+        driver.switchTo().window(mainHandle);
+    }
+
+    public void closeCurrentTab() {
+        driver.close();
+    }
 }

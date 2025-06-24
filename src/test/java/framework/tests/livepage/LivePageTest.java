@@ -1,33 +1,29 @@
-package framework.tests;
+package framework.tests.livepage;
 
-import framework.config.Config;
-import framework.driver.DriverFactory;
 import framework.pages.HomePage;
 import framework.pages.LivePage;
+import framework.tests.basePage.BaseTest;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.testng.annotations.*;
 import org.testng.asserts.SoftAssert;
 
-public class LivePageTest {
+public class LivePageTest extends BaseTest {
 
-    WebDriver driver;
-    HomePage homePage;
-    LivePage livePage;
-    SoftAssert softAssert = new SoftAssert();
+    private HomePage homePage;
+    private LivePage livePage;
+    private SoftAssert softAssert = new SoftAssert();
 
     private final By popupLocator = By.id("user-accounts-tooltip");
 
     @BeforeMethod
-    public void setup() {
-        driver = DriverFactory.getDriver();
-        driver.get(Config.get("base.url"));
+    public void setUp() {
         homePage = new HomePage(driver);
+        livePage = new LivePage(driver);
     }
 
     @Test(description = "Verify LIVE button navigation and functionality")
     public void verifyLiveButton() {
-        livePage = new LivePage(driver);
+
         homePage.waitForInvisibility(popupLocator);
         homePage.clickMainMenu(HomePage.MainMenu.LIVE);
 
@@ -43,8 +39,4 @@ public class LivePageTest {
         softAssert.assertAll();
     }
 
-    @AfterMethod
-    public void tearDown() {
-        DriverFactory.quitDriver();
-    }
 }

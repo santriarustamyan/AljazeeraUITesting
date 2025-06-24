@@ -73,6 +73,23 @@ public class HomePage extends BasePage {
         }
     }
 
+    public enum SocialMediaLinks {
+        FACEBOOK("//a[@aria-label='Follow us on Facebook']"),
+        X("//a[@aria-label='Follow us on Twitter']"),
+        YOUTUBE("//a[@aria-label='Follow us on Youtube']"),
+        INSTAGRAM("//a[@aria-label='Follow us on Instagram']");
+
+        private final String xpath;
+
+        SocialMediaLinks(String xpath) {
+            this.xpath = xpath;
+        }
+
+        public By getLocator() {
+            return By.xpath(xpath);
+        }
+    }
+
     public void clickMainMenu(MainMenu menu) {
         safeClick(menu.getLocator());
     }
@@ -96,4 +113,13 @@ public class HomePage extends BasePage {
     public String getMoreSubMenuText(MoreSubMenu subMenu) {
         return getText(subMenu.getLocator());
     }
+
+    public void clickSocialMediaLink(SocialMediaLinks link) {
+        safeClick(link.getLocator());
+    }
+
+    public boolean isSocialLinkVisible(SocialMediaLinks link) {
+        return isDisplayed(link.getLocator());
+    }
+
 }

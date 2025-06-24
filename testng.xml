@@ -1,8 +1,8 @@
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
-<suite name="UI Automation Suite">
-    <test name="HomePage Tests">
-        <classes>
-            <class name="framework.tests.HomePageTest"/>
-        </classes>
+<suite name="Full UI Automation Suite">
+    <test name="All Tests">
+        <packages>
+            <package name="framework.tests"/>
+        </packages>
     </test>
 </suite>

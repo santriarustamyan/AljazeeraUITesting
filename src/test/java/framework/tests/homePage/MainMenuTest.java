@@ -1,26 +1,22 @@
-package framework.tests;
+package framework.tests.homePage;
 
-import framework.config.Config;
-import framework.driver.DriverFactory;
 import framework.pages.HomePage;
-import org.openqa.selenium.WebDriver;
+import framework.tests.basePage.BaseTest;
 import org.testng.annotations.*;
 import org.testng.asserts.SoftAssert;
 
-public class HomePageTest {
+public class MainMenuTest extends BaseTest {
 
-    private WebDriver driver;
     private HomePage homePage;
 
     @BeforeMethod
-    public void setup() {
-        driver = DriverFactory.getDriver();
-        driver.get(Config.get("base.url"));
+    public void setUp() {
         homePage = new HomePage(driver);
     }
 
     @Test
     public void verifyMainAndSubMenus() {
+
         SoftAssert softAssert = new SoftAssert();
 
         softAssert.assertEquals(homePage.getMainMenuText(HomePage.MainMenu.NEWS), "News");
@@ -51,10 +47,5 @@ public class HomePageTest {
         softAssert.assertEquals(homePage.getMoreSubMenuText(HomePage.MoreSubMenu.PODCASTS), "Podcasts");
 
         softAssert.assertAll();
-    }
-
-    @AfterMethod
-    public void tearDown() {
-        DriverFactory.quitDriver();
     }
 }
