@@ -4,14 +4,13 @@ import framework.pages.HomePage;
 import framework.pages.LivePage;
 import framework.tests.basePage.BaseTest;
 import org.openqa.selenium.By;
+import org.testng.Assert;
 import org.testng.annotations.*;
-import org.testng.asserts.SoftAssert;
 
 public class LivePageTest extends BaseTest {
 
     private HomePage homePage;
     private LivePage livePage;
-    private SoftAssert softAssert = new SoftAssert();
 
     private final By popupLocator = By.id("user-accounts-tooltip");
 
@@ -22,22 +21,20 @@ public class LivePageTest extends BaseTest {
         livePage = new LivePage(driver);
     }
 
-    @Test(description = "Verify LIVE button navigation and functionality")
-    public void verifyLiveButton() {
-
-        homePage.waitForInvisibility(popupLocator);
+    @Test(description = "Verify that the Livestream player is visible on the LIVE page")
+    public void verifyLivestreamPlayerIsVisible() {
+        homePage.waitForOptionalInvisibility(popupLocator);
         homePage.clickMainMenu(HomePage.MainMenu.LIVE);
 
-        // Verify correct URL after navigation
-        softAssert.assertTrue(driver.getCurrentUrl().contains("/live"), "URL is incorrect after clicking LIVE button");
+        Assert.assertTrue(livePage.isLivestreamPlayerVisible(), "Livestream player is not visible on the page");
+    }
 
-        // Verify LIVE page header
-        softAssert.assertTrue(livePage.isLiveHeaderDisplayed(), "LIVE page header is not displayed");
+    @Test(description = "Verify that the Switch Player button is visible on the LIVE page")
+    public void verifySwitchPlayerButtonVisible() {
+        homePage.waitForOptionalInvisibility(popupLocator);
+        homePage.clickMainMenu(HomePage.MainMenu.LIVE);
 
-        // Verify Switch Player button
-        softAssert.assertTrue(livePage.isSwitchPlayerPresent(), "Switch Player button is not present");
-
-        softAssert.assertAll();
+        Assert.assertTrue(livePage.isSwitchPlayerPresent(), "Switch Player button is not present on the page");
     }
 
 }

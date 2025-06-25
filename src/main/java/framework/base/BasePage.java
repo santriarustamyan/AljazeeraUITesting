@@ -60,9 +60,14 @@ public abstract class BasePage {
         return wait.until(ExpectedConditions.elementToBeClickable(locator));
     }
 
-    public void waitForInvisibility(By locator) {
-        wait.until(ExpectedConditions.invisibilityOfElementLocated(locator));
+    public void waitForOptionalInvisibility(By locator) {
+        try {
+            WebDriverWait shortWait = new WebDriverWait(driver, Duration.ofSeconds(3));
+            shortWait.until(ExpectedConditions.invisibilityOfElementLocated(locator));
+        } catch (TimeoutException ignored) {
+        }
     }
+
 
     protected String getText(By locator) {
         return waitForVisibility(locator).getText();
