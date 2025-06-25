@@ -3,9 +3,14 @@ package framework.base;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.time.Duration;
 
 public abstract class BasePage {
+
+    public static final Logger logger = LoggerFactory.getLogger(BasePage.class);
 
     protected WebDriver driver;
     private final WebDriverWait wait;
@@ -25,10 +30,10 @@ public abstract class BasePage {
         try {
             element.click();
         } catch (ElementClickInterceptedException e) {
+            logger.warn("Element click intercepted, fallback to JS click: {}", locator);
             clickWithJS(element);
         }
     }
-
 
     protected void scrollIntoView(WebElement element) {
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", element);
@@ -68,6 +73,15 @@ public abstract class BasePage {
             return wait.until(ExpectedConditions.visibilityOfElementLocated(locator)).isDisplayed();
         } catch (TimeoutException e) {
             return false;
+        }
+    }
+
+    protected void scrollToElement(By locator) {
+        try {
+            WebElement element = driver.findElement(locator);
+            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
+        } catch (Exception e) {
+            logger.warn("✗ Scroll failed for: {}", locator, e);
         }
     }
 

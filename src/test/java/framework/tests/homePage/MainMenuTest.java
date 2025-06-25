@@ -11,6 +11,7 @@ public class MainMenuTest extends BaseTest {
 
     @BeforeMethod
     public void setUp() {
+        startDriver("desktop");
         homePage = new HomePage(driver);
     }
 

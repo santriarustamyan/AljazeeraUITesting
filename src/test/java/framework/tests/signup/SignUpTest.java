@@ -25,6 +25,7 @@ public class SignUpTest extends BaseTest {
 
     @BeforeMethod
     public void setUp() {
+        startDriver("desktop");
         homePage = new HomePage(driver);
         signUpPage = new SignUpPage(driver);
         mailSlurpService = new MailSlurpService();

@@ -10,9 +10,8 @@ public abstract class BaseTest {
 
     protected WebDriver driver;
 
-    @BeforeMethod(alwaysRun = true)
-    public void setUpAlways() {
-        driver = DriverFactory.getDriver();
+    protected void startDriver(String mode) {
+        driver = DriverFactory.getDriver(mode);
         driver.get(Config.get("base.url"));
     }
 

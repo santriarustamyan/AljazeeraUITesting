@@ -12,7 +12,8 @@ public class SocialMediaLinksTest extends BaseTest {
     HomePage homePage;
 
     @BeforeMethod
-    public void additionalSetup(){
+    public void setUp(){
+        startDriver("desktop");
         homePage = new HomePage(driver);
     }
 

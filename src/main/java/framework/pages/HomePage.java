@@ -2,6 +2,7 @@ package framework.pages;
 
 import framework.base.BasePage;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 
 public class HomePage extends BasePage {
@@ -90,6 +91,10 @@ public class HomePage extends BasePage {
         }
     }
 
+    private final By mostPopularSection = By.className("trending-articles__header-title");
+    private final By mostPopularPostsCount = By.cssSelector("ol.trending-articles__list li");
+    private final By skipToMostReadLink = By.cssSelector(".screen-reader-text");
+
     public void clickMainMenu(MainMenu menu) {
         safeClick(menu.getLocator());
     }
@@ -122,4 +127,17 @@ public class HomePage extends BasePage {
         return isDisplayed(link.getLocator());
     }
 
+    public boolean isMostPopularVisible() {
+        scrollToElement(mostPopularSection);
+        return isDisplayed(mostPopularSection);
+    }
+
+    public int getMostPopularPostsCount() {
+        scrollToElement(mostPopularSection);
+        return driver.findElements(mostPopularPostsCount).size();
+    }
+
+    public void clickSkipToMostReadLink() {
+        driver.findElement(skipToMostReadLink).sendKeys(Keys.ENTER);
+    }
 }

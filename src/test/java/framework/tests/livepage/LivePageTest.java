@@ -17,6 +17,7 @@ public class LivePageTest extends BaseTest {
 
     @BeforeMethod
     public void setUp() {
+        startDriver("desktop");
         homePage = new HomePage(driver);
         livePage = new LivePage(driver);
     }
