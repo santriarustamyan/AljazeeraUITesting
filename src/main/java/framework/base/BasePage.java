@@ -48,7 +48,6 @@ public abstract class BasePage {
         try {
             wait.until(ExpectedConditions.invisibilityOfElementLocated(overlayLocator));
         } catch (TimeoutException ignored) {
-            // игнорируем если overlay не появляется
         }
     }
 

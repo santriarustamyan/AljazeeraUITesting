@@ -2,9 +2,15 @@ package framework.tests.homePage;
 
 import framework.pages.HomePage;
 import framework.tests.basePage.BaseTest;
+import io.qameta.allure.*;
+import io.qameta.allure.testng.Tag;
 import org.testng.annotations.*;
 import org.testng.asserts.SoftAssert;
 
+@Epic("Navigation")
+@Feature("Main Menu")
+@Owner("Santri")
+@Tag("UI")
 public class MainMenuTest extends BaseTest {
 
     private HomePage homePage;
@@ -15,7 +21,11 @@ public class MainMenuTest extends BaseTest {
         homePage = new HomePage(driver);
     }
 
+
     @Test
+    @Story("Verify main and sub menus are displayed correctly")
+    @Description("Asserts visibility and correctness of main and submenu items on homepage")
+    @Severity(SeverityLevel.NORMAL)
     public void verifyMainAndSubMenus() {
 
         SoftAssert softAssert = new SoftAssert();

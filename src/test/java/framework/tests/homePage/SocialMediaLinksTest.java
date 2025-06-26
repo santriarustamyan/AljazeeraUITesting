@@ -2,11 +2,16 @@ package framework.tests.homePage;
 
 import framework.pages.HomePage;
 import framework.tests.basePage.BaseTest;
+import io.qameta.allure.*;
+import io.qameta.allure.testng.Tag;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-
+@Epic("Social Media")
+@Feature("Footer links")
+@Owner("Santri")
+@Tag("Regression")
 public class SocialMediaLinksTest extends BaseTest {
 
     HomePage homePage;
@@ -18,8 +23,10 @@ public class SocialMediaLinksTest extends BaseTest {
     }
 
     @Test
+    @Story("Verify all social media links")
+    @Description("Each social link is visible, clickable, and redirects to the correct external site")
+    @Severity(SeverityLevel.NORMAL)
     public void verifySocialMediaLinksAreVisibleAndClickable() {
-
 
         for (HomePage.SocialMediaLinks link : HomePage.SocialMediaLinks.values()) {
             Assert.assertTrue(homePage.isSocialLinkVisible(link),

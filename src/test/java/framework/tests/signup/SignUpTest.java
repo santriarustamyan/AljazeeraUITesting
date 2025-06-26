@@ -8,6 +8,8 @@ import framework.pages.SignUpPage;
 import framework.tests.basePage.BaseTest;
 import framework.utils.EmailParser;
 import framework.utils.TestDataGenerator;
+import io.qameta.allure.*;
+import io.qameta.allure.testng.Tag;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
@@ -15,6 +17,10 @@ import org.testng.annotations.*;
 
 import java.time.Duration;
 
+@Epic("User Registration")
+@Feature("Sign Up Flow")
+@Owner("Santri")
+@Tag("Signup")
 public class SignUpTest extends BaseTest {
 
 
@@ -32,6 +38,9 @@ public class SignUpTest extends BaseTest {
     }
 
     @Test(description = "Verify Sign Up flow with email verification")
+    @Story("Email verification")
+    @Description("Test the full sign-up flow including form submission and email verification")
+    @Severity(SeverityLevel.CRITICAL)
     public void verifySignUpFlow() throws Exception {
 
         // Create new inbox
