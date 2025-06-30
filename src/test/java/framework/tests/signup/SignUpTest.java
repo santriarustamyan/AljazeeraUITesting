@@ -17,19 +17,24 @@ import org.testng.annotations.*;
 
 import java.time.Duration;
 
+/**
+ * Test suite for verifying the user sign-up flow, including email verification.
+ */
 @Epic("User Registration")
 @Feature("Sign Up Flow")
 @Owner("Santri")
 @Tag("Signup")
 public class SignUpTest extends BaseTest {
 
-
     private HomePage homePage;
     private SignUpPage signUpPage;
     private MailSlurpService mailSlurpService;
     private InboxDto inbox;
 
-    @BeforeMethod
+    /**
+     * Setup before each test: initialize driver and page objects.
+     */
+    @BeforeMethod(alwaysRun = true)
     public void setUp() {
         startDriver("desktop");
         homePage = new HomePage(driver);
@@ -37,38 +42,53 @@ public class SignUpTest extends BaseTest {
         mailSlurpService = new MailSlurpService();
     }
 
+    /**
+     * Verifies the full sign-up flow including form submission and email verification.
+     */
     @Test(description = "Verify Sign Up flow with email verification")
     @Story("Email verification")
     @Description("Test the full sign-up flow including form submission and email verification")
     @Severity(SeverityLevel.CRITICAL)
     public void verifySignUpFlow() throws Exception {
 
-        // Create new inbox
+        Allure.step("Create new MailSlurp inbox");
         inbox = mailSlurpService.createInbox();
         String email = inbox.getEmailAddress();
         String password = TestDataGenerator.generatePassword();
 
-        // Open Sign Up page
+        Allure.step("Navigate to Sign Up page");
         homePage.clickMainMenu(HomePage.MainMenu.SIGNUP);
 
-        // Fill and submit Sign Up form
+        Allure.step("Fill Sign Up form with email: " + email);
         signUpPage.fillSignUpForm(email, password);
+
+        Allure.step("Submit Sign Up form");
         signUpPage.submitForm();
 
-        // Wait and verify received email
+        Allure.step("Wait for verification email");
         Email emailReceived = mailSlurpService.waitForLatestEmail(inbox);
-        Assert.assertNotNull(emailReceived, "No verification email received");
-        Assert.assertTrue(emailReceived.getSubject().contains("Verify"), "Verification email subject incorrect");
 
-        // Extract verification link and navigate
+        Allure.step("Assert that verification email was received");
+        Assert.assertNotNull(emailReceived, "No verification email received");
+        Assert.assertTrue(
+                emailReceived.getSubject().toLowerCase().contains("verify"),
+                "Verification email subject is incorrect: " + emailReceived.getSubject()
+        );
+
+        Allure.step("Extract verification link from email");
         String verificationLink = EmailParser.extractVerificationLink(emailReceived);
+
+        Allure.step("Navigate to verification link");
         driver.navigate().to(verificationLink);
 
-        // Wait for verification confirmation page
+        Allure.step("Wait for onboarding page URL");
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
         wait.until(ExpectedConditions.urlContains("/onboarding/newsletters"));
 
-        Assert.assertTrue(driver.getCurrentUrl().contains("/onboarding/newsletters"), "Verification failed.");
+        Allure.step("Assert that verification succeeded");
+        Assert.assertTrue(
+                driver.getCurrentUrl().contains("/onboarding/newsletters"),
+                "Verification failed: unexpected URL " + driver.getCurrentUrl()
+        );
     }
-
 }

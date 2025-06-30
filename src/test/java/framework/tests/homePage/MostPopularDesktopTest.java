@@ -8,6 +8,10 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+/**
+ * Tests to verify the visibility and item count of the 'Most Popular' section
+ * on the homepage when accessed in desktop mode.
+ */
 @Epic("Most Popular Section")
 @Feature("Desktop Display")
 @Owner("Santri")
@@ -16,26 +20,42 @@ public class MostPopularDesktopTest extends BaseTest {
 
     private HomePage homePage;
 
-    @BeforeMethod
+    /**
+     * Initializes the desktop driver and opens the homepage before each test.
+     */
+    @BeforeMethod(alwaysRun = true)
     public void setup() {
         startDriver("desktop");
         homePage = new HomePage(driver);
     }
 
+    /**
+     * Verifies that the 'Most Popular' section is visible on the homepage in desktop mode.
+     */
     @Test(description = "Verify that 'Most Popular' section is visible on Desktop")
     @Story("Display on desktop")
-    @Description("Verify that 'Most Popular' section is visible on desktop")
+    @Description("Ensure that the 'Most Popular' section is displayed when viewed on a desktop resolution")
     @Severity(SeverityLevel.NORMAL)
     public void verifyMostPopularSectionIsVisible() {
-        Assert.assertTrue(homePage.isMostPopularVisible(), "'Most Popular' section is not visible on Desktop.");
+        Assert.assertTrue(
+                homePage.isMostPopularVisible(),
+                "'Most Popular' section is not visible on Desktop."
+        );
     }
 
+    /**
+     * Verifies that the 'Most Popular' section contains exactly 10 posts.
+     */
     @Test(description = "Verify that 'Most Popular' section has exactly 10 items on Desktop")
     @Story("Item count verification")
-    @Description("Ensure there are exactly 10 items in 'Most Popular' section")
+    @Description("Ensure that there are exactly 10 articles listed in the 'Most Popular' section")
     @Severity(SeverityLevel.MINOR)
     public void verifyTrendingArticlesCountIsTen() {
-        int count = homePage.getMostPopularPostsCount();
-        Assert.assertEquals(count, 10, "Expected 10 trending articles but found: " + count);
+        int actualCount = homePage.getMostPopularPostsCount();
+        Assert.assertEquals(
+                actualCount,
+                10,
+                "Expected 10 trending articles but found: " + actualCount
+        );
     }
 }

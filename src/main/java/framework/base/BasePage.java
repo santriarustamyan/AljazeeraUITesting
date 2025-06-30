@@ -8,25 +8,60 @@ import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 
+/**
+ * Abstract base class for all Page Objects.
+ * Provides common Selenium utility methods with built-in wait support.
+ */
 public abstract class BasePage {
 
-    public static final Logger logger = LoggerFactory.getLogger(BasePage.class);
+    protected final WebDriver driver;
+    protected final WebDriverWait wait;
 
-    protected WebDriver driver;
-    private final WebDriverWait wait;
+    public static final Logger logger = LoggerFactory.getLogger(BasePage.class);
 
     public BasePage(WebDriver driver) {
         this.driver = driver;
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(30));
     }
 
-    protected void safeClick(By locator) {
-        waitForOverlayToDisappear();
+    /**
+     * Waits for the document ready state to be 'complete'.
+     */
+    public void waitForPageLoaded() {
+        wait.until(webDriver ->
+                ((JavascriptExecutor) webDriver).executeScript("return document.readyState").equals("complete"));
+    }
 
-        WebElement element = wait.until(ExpectedConditions.presenceOfElementLocated(locator));
+    /**
+     * Scrolls the page down by a specified number of pixels.
+     *
+     * @param pixels number of pixels to scroll down
+     */
+    public void scrollDown(int pixels) {
+        ((JavascriptExecutor) driver).executeScript("window.scrollBy(0, arguments[0]);", pixels);
+    }
+
+    /**
+     * Scrolls the element into the center of the viewport.
+     */
+    protected void scrollIntoView(WebElement element) {
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", element);
+    }
+
+    /**
+     * Scrolls to a specific element located by a locator.
+     */
+    protected void scrollToElement(By locator) {
+        WebElement element = waitForVisibility(locator);
         scrollIntoView(element);
-        wait.until(ExpectedConditions.elementToBeClickable(element));
+    }
 
+    /**
+     * Clicks an element using safe wait, scrolls to it and handles interception fallback.
+     */
+    protected void safeClick(By locator) {
+        WebElement element = waitForClickability(locator);
+        scrollIntoView(element);
         try {
             element.click();
         } catch (ElementClickInterceptedException e) {
@@ -35,82 +70,111 @@ public abstract class BasePage {
         }
     }
 
-    protected void scrollIntoView(WebElement element) {
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", element);
-    }
-
-    protected void clickWithJS(WebElement element) {
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
-    }
-
-    public void waitForOverlayToDisappear() {
-        By overlayLocator = By.cssSelector(".your-overlay-class");
+    /**
+     * Clicks a WebElement safely with wait and JS fallback.
+     */
+    protected void safeClick(WebElement element) {
+        wait.until(ExpectedConditions.elementToBeClickable(element));
+        scrollIntoView(element);
         try {
-            wait.until(ExpectedConditions.invisibilityOfElementLocated(overlayLocator));
-        } catch (TimeoutException ignored) {
+            element.click();
+        } catch (ElementClickInterceptedException e) {
+            logger.warn("Element click intercepted, fallback to JS click");
+            clickWithJS(element);
         }
     }
 
+    /**
+     * Waits for an element to be visible and returns it.
+     */
     protected WebElement waitForVisibility(By locator) {
         return wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
     }
 
+    /**
+     * Waits for an element to be clickable and returns it.
+     */
     protected WebElement waitForClickability(By locator) {
         return wait.until(ExpectedConditions.elementToBeClickable(locator));
     }
 
-    public void waitForOptionalInvisibility(By locator) {
-        try {
-            WebDriverWait shortWait = new WebDriverWait(driver, Duration.ofSeconds(3));
-            shortWait.until(ExpectedConditions.invisibilityOfElementLocated(locator));
-        } catch (TimeoutException ignored) {
-        }
+    /**
+     * Waits for an element to be present in the DOM (regardless of visibility).
+     */
+    protected WebElement waitForPresence(By locator) {
+        return wait.until(ExpectedConditions.presenceOfElementLocated(locator));
     }
 
-
+    /**
+     * Gets text from an element after ensuring it is visible.
+     */
     protected String getText(By locator) {
         return waitForVisibility(locator).getText();
     }
 
-    public boolean isDisplayed(By locator) {
-        try {
-            return wait.until(ExpectedConditions.visibilityOfElementLocated(locator)).isDisplayed();
-        } catch (TimeoutException e) {
-            return false;
-        }
-    }
-
-    protected void scrollToElement(By locator) {
-        try {
-            WebElement element = driver.findElement(locator);
-            ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
-        } catch (Exception e) {
-            logger.warn("✗ Scroll failed for: {}", locator, e);
-        }
-    }
-
+    /**
+     * Types text into an input field after waiting for it to be clickable.
+     */
     protected void typeText(By locator, String text) {
         WebElement element = waitForClickability(locator);
         element.clear();
         element.sendKeys(text);
     }
 
-    public void switchToNewTab() {
-        String currentHandle = driver.getWindowHandle();
-        for (String handle : driver.getWindowHandles()) {
-            if (!handle.equals(currentHandle)) {
-                driver.switchTo().window(handle);
-                break;
-            }
+    /**
+     * Returns true if the element is visible within timeout, false otherwise.
+     */
+    public boolean isDisplayed(By locator) {
+        try {
+            return waitForVisibility(locator).isDisplayed();
+        } catch (TimeoutException e) {
+            return false;
         }
     }
 
+    /**
+     * Fallback click method using JavaScript.
+     */
+    protected void clickWithJS(WebElement element) {
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
+    }
+
+    /**
+     * Switches WebDriver context to the newly opened browser tab.
+     */
+    public void switchToNewTab() {
+        // Get all window handles
+        var windowHandles = driver.getWindowHandles();
+        // Switch to the last one (newly opened)
+        driver.switchTo().window(windowHandles.toArray()[windowHandles.size() - 1].toString());
+    }
+
+    /**
+     * Switches WebDriver context back to the main (first) browser tab.
+     */
     public void switchToMainTab() {
-        String mainHandle = driver.getWindowHandles().iterator().next();
+        // Get the first window handle
+        var mainHandle = driver.getWindowHandles().iterator().next();
         driver.switchTo().window(mainHandle);
     }
 
+    /**
+     * Closes the currently active browser tab.
+     */
     public void closeCurrentTab() {
         driver.close();
     }
+
+    /**
+     * Waits for an optional overlay or popup to disappear.
+     * If the element is not present, does nothing.
+     */
+    public void waitForOptionalInvisibility(By locator) {
+        try {
+            wait.until(ExpectedConditions.invisibilityOfElementLocated(locator));
+        } catch (TimeoutException | NoSuchElementException ignored) {
+            logger.info("Overlay not visible or already disappeared: " + locator);
+        }
+    }
+
 }
