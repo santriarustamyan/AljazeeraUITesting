@@ -92,6 +92,36 @@ public abstract class BasePage {
     }
 
     /**
+     * Checks whether an element exists in the DOM without waiting for visibility.
+     *
+     * @param locator the By locator of the element
+     * @return true if the element is present in the DOM, false otherwise
+     */
+    public boolean isElementPresent(By locator) {
+        try {
+            driver.findElement(locator);
+            return true;
+        } catch (NoSuchElementException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Checks whether an element is invisible or completely absent from the DOM.
+     *
+     * @param locator the By locator of the element
+     * @return true if the element is either invisible or not present
+     */
+    public boolean isInvisibleOrAbsent(By locator) {
+        try {
+            return wait.until(ExpectedConditions.invisibilityOfElementLocated(locator));
+        } catch (TimeoutException e) {
+            // If the element is still visible after the timeout, return false
+            return false;
+        }
+    }
+
+    /**
      * Waits for an element to be clickable and returns it.
      */
     protected WebElement waitForClickability(By locator) {

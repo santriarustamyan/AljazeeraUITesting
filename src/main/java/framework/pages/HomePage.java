@@ -156,6 +156,24 @@ public class HomePage extends BasePage {
         return isDisplayed(mostPopularSection);
     }
 
+    /**
+     * Checks whether the 'Most Popular' section is present in the DOM without considering visibility.
+     *
+     * @return true if the section is present, false otherwise
+     */
+    public boolean isMostPopularPresent() {
+        return isElementPresent(mostPopularSection);
+    }
+
+    /**
+     * Checks whether the 'Most Popular' section is either invisible or absent from the DOM.
+     *
+     * @return true if the section is invisible or absent
+     */
+    public boolean isMostPopularInvisibleOrAbsent() {
+        return isInvisibleOrAbsent(mostPopularSection);
+    }
+
     public int getMostPopularPostsCount() {
         scrollToElement(mostPopularSection);
         return driver.findElements(mostPopularPostsCount).size();
