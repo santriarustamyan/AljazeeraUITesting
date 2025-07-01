@@ -37,6 +37,8 @@ public class OpinionSectionTest extends BaseTest {
     @Description("Ensure that the Opinion section is displayed and displays exactly six posts on the homepage")
     @Severity(SeverityLevel.NORMAL)
     public void verifyOpinionSectionVisibleAndContainsSixPosts() {
+        Allure.step("Ensure Opinion section is loaded and visible");
+        homePage.ensureOpinionSectionVisible();
         Allure.step("Check that the Opinion section is visible");
         Assert.assertTrue(
                 homePage.isOpinionSectionVisible(),
