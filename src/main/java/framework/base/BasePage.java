@@ -44,7 +44,7 @@ public abstract class BasePage {
     /**
      * Scrolls the element into the center of the viewport.
      */
-    protected void scrollIntoView(WebElement element) {
+    public void scrollIntoView(WebElement element) {
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block: 'center'});", element);
     }
 
@@ -73,7 +73,7 @@ public abstract class BasePage {
     /**
      * Clicks a WebElement safely with wait and JS fallback.
      */
-    protected void safeClick(WebElement element) {
+    public void safeClick(WebElement element) {
         wait.until(ExpectedConditions.elementToBeClickable(element));
         scrollIntoView(element);
         try {
@@ -87,8 +87,18 @@ public abstract class BasePage {
     /**
      * Waits for an element to be visible and returns it.
      */
-    protected WebElement waitForVisibility(By locator) {
+    public WebElement waitForVisibility(By locator) {
         return wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
+    }
+
+    /**
+     * Waits for the given WebElement to become visible.
+     * Useful when you already have a WebElement instance and need to wait explicitly.
+     *
+     * @param element The WebElement to wait for.
+     */
+    public void waitUntilVisible(WebElement element) {
+        wait.until(ExpectedConditions.visibilityOf(element));
     }
 
     /**
@@ -205,6 +215,13 @@ public abstract class BasePage {
         } catch (TimeoutException | NoSuchElementException ignored) {
             logger.info("Overlay not visible or already disappeared: " + locator);
         }
+    }
+
+    /**
+     * Scrolls down to the bottom of the page using JavaScript.
+     */
+    public void scrollToBottom() {
+        ((JavascriptExecutor) driver).executeScript("window.scrollTo(0, document.body.scrollHeight);");
     }
 
 }

@@ -113,6 +113,9 @@ public class HomePage extends BasePage {
     private final By opinionPosts = By.cssSelector("ul.card-opinion-collection__list li");
     private final By opinionPostCreator = By.className("card-opinion-collection__article__authorlink");
 
+    // 'Our Channels' footer section header
+    private final By ourChannelsHeader = By.xpath("(//ul[@class='menu footer-menu']//li[@class='menu__item menu__item--aje menu__item--has-submenu']//h2)[3]");
+
     private int lastRandomIndex = -1;
 
     // ------------------- Menu Methods -------------------
@@ -250,3 +253,52 @@ public class HomePage extends BasePage {
         throw new RuntimeException("Failed to click opinion post after retries.");
     }
 }
+
+//     ------------------- OurChannels Section Methods -------------------
+
+    /**
+     * Enum for locating 'Our Channels' footer links on Al Jazeera home page.
+     */
+    public enum OurChannels {
+        AL_JAZEERA_ARABIC("//a[@href='http://aljazeera.net/']"),
+        AL_JAZEERA_ENGLISH("//a[@href='https://www.aljazeera.com/']"),
+        INVESTIGATIVE_UNIT("//a[@href='https://www.ajiunit.com/']"),
+        MUBASHER("//a[@href='https://www.aljazeeramubasher.net/']"),
+        DOCUMENTARY("//a[@href='http://doc.aljazeera.net/']"),
+        BALKANS("//a[@href='http://balkans.aljazeera.net/']"),
+        AJ_PLUS("//a[@href='http://ajplus.net/']")
+        ;
+
+        private final String xpath;
+
+        OurChannels(String xpath) {
+            this.xpath = xpath;
+        }
+
+        /**
+         * Returns By locator for the link.
+         */
+        public By getLocator() {
+            return By.xpath(xpath);
+        }
+    }
+
+    /**
+     * Returns the WebElement representing the 'Our Channels' section header in the footer.
+     *
+     * @return WebElement of the 'Our Channels' header
+     */
+    public WebElement getOurChannelsHeader() {
+        return driver.findElement(ourChannelsHeader);
+    }
+
+
+    /**
+     * Returns the WebElement for a specific 'Our Channels' link.
+     *
+     * @param channel Enum representing the link.
+     * @return WebElement of the link.
+     */
+    public WebElement getOurChannelLink(OurChannels channel) {
+        return driver.findElement(channel.getLocator());
+    }
