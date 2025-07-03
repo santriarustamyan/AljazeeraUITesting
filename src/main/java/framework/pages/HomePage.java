@@ -251,6 +251,74 @@ public class HomePage extends BasePage {
             }
         }
         throw new RuntimeException("Failed to click opinion post after retries.");
+
+
+    // ------------------- About Section -------------------
+
+    /**
+     * Enum representing footer 'About' section links.
+     */
+    public enum AboutLinks {
+        ABOUT_US("About Us"),
+        CODE_OF_ETHICS("Code of Ethics"),
+        TERMS_AND_CONDITIONS("Terms and Conditions"),
+        EU_EEA_REGULATORY_NOTICE("EU/EEA Regulatory Notice"),
+        PRIVACY_POLICY("Privacy Policy"),
+        COOKIE_POLICY("Cookie Policy"),
+        COOKIE_PREFERENCES("Cookie Preferences"),
+        SITEMAP("Sitemap"),
+        WORK_FOR_US("Work for us");
+
+        private final String xpath;
+
+        AboutLinks(String xpath) {
+            this.xpath = xpath;
+        }
+
+        public By getLocator() {
+            return By.xpath(xpath);
+        }
+    }
+
+    /**
+     * Returns the header WebElement of the 'About' section.
+     */
+    public WebElement getAboutSectionHeader() {
+        return driver.findElement(aboutSectionHeader);
+    }
+
+    /**
+     * Returns a specific link WebElement from the 'About' section.
+     */
+    public WebElement getAboutLink(AboutLinks link) {
+        return driver.findElement(link.getLocator());
+    }
+
+// ------------------- Connect Section -------------------
+
+    /**
+     * Enum representing footer 'Connect' section links.
+     */
+    public enum ConnectLinks {
+        CONTACT_US("Contact Us"),
+        USER_ACCOUNTS_HELP("User Accounts Help"),
+        ADVERTISE_WITH_US("Advertise with us"),
+        STAY_CONNECTED("Stay Connected"),
+        NEWSLETTERS("Newsletters"),
+        CHANNEL_FINDER("Channel Finder"),
+        TV_SCHEDULE("TV Schedule"),
+        PODCASTS("Podcasts"),
+        SUBMIT_A_TIP("Submit a Tip");
+
+        private final String xpath;
+
+        ConnectLinks(String xpath) {
+            this.xpath = xpath;
+        }
+
+        public By getLocator() {
+            return By.xpath(xpath);
+        }
     }
 }
 
