@@ -280,19 +280,6 @@ public class HomePage extends BasePage {
         }
     }
 
-    /**
-     * Returns the header WebElement of the 'About' section.
-     */
-    public WebElement getAboutSectionHeader() {
-        return driver.findElement(aboutSectionHeader);
-    }
-
-    /**
-     * Returns a specific link WebElement from the 'About' section.
-     */
-    public WebElement getAboutLink(AboutLinks link) {
-        return driver.findElement(link.getLocator());
-    }
 
 // ------------------- Connect Section -------------------
 
@@ -320,7 +307,6 @@ public class HomePage extends BasePage {
             return By.xpath(xpath);
         }
     }
-}
 
 //     ------------------- OurChannels Section Methods -------------------
 
