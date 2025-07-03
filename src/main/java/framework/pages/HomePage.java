@@ -302,3 +302,5 @@ public class HomePage extends BasePage {
     public WebElement getOurChannelLink(OurChannels channel) {
         return driver.findElement(channel.getLocator());
     }
+
+}
