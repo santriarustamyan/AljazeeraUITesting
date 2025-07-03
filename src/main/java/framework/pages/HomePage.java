@@ -2,6 +2,10 @@ package framework.pages;
 
 import framework.base.BasePage;
 import org.openqa.selenium.*;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.time.Duration;
 import java.util.List;
 import java.util.Random;
 
@@ -112,6 +116,9 @@ public class HomePage extends BasePage {
     private final By opinionSectionTitle = By.cssSelector(".card-opinion-collection__heading");
     private final By opinionPosts = By.cssSelector("ul.card-opinion-collection__list li");
     private final By opinionPostCreator = By.className("card-opinion-collection__article__authorlink");
+
+    // 'About' footer section header
+    private final By aboutSectionHeader = By.xpath("(//ul[@class='menu footer-menu']//li[@class='menu__item menu__item--aje menu__item--has-submenu']//h2)[1]");
 
     // 'Our Channels' footer section header
     private final By ourChannelsHeader = By.xpath("(//ul[@class='menu footer-menu']//li[@class='menu__item menu__item--aje menu__item--has-submenu']//h2)[3]");
@@ -253,8 +260,74 @@ public class HomePage extends BasePage {
         throw new RuntimeException("Failed to click opinion post after retries.");
     }
 
+    // ------------------- About Section -------------------
 
+    /**
+     * Enum representing footer 'About' section links.
+     */
+    public enum AboutLinks {
+        ABOUT_US("//a[@href='https://www.aljazeera.com/about-us']"),
+        CODE_OF_ETHICS("//a[@href='/code-of-ethics/']"),
+        TERMS_AND_CONDITIONS("//a[@href='/terms-and-conditions/']"),
+        EU_EEA_REGULATORY_NOTICE("//a[@href='/eu-eea-regulatory/']"),
+        PRIVACY_POLICY("//a[@href='https://privacy.aljazeera.net/']"),
+        COOKIE_POLICY("//a[@href='https://privacy.aljazeera.net/cookie/']"),
+        COOKIE_PREFERENCES("//a[@href='#cookiesPreferences']"),
+        SITEMAP("//a[@href='https://www.aljazeera.com/sitemap']"),
+        WORK_FOR_US("//a[@href='https://careers.aljazeera.net/']");
 
+        private final String xpath;
+
+        AboutLinks(String xpath) {
+            this.xpath = xpath;
+        }
+
+        public By getLocator() {
+            return By.xpath(xpath);
+        }
+    }
+
+    /**
+     * Returns the header WebElement of the 'About' section.
+     */
+    public WebElement getAboutSectionHeader() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(aboutSectionHeader));
+    }
+
+    /**
+     * Returns a specific link WebElement from the 'About' section.
+     */
+    public WebElement getAboutLink(AboutLinks link) {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(link.getLocator()));
+    }
+
+    /**
+     * Attempts to close the Cookie Preferences modal if it appears within a short wait.
+     *
+     * @return true if the modal was found and closed, false if modal did not appear.
+     */
+    public boolean closeCookiePreferencesModalIfPresent() {
+        By modalLocator = By.cssSelector("[aria-label='Privacy Preference Center']");
+        By saveButtonLocator = By.cssSelector("button[class='save-preference-btn-handler onetrust-close-btn-handler']");
+
+        try {
+            // Short explicit wait for presence (e.g., up to 5 seconds)
+            new WebDriverWait(driver, Duration.ofSeconds(5))
+                    .until(ExpectedConditions.presenceOfElementLocated(modalLocator));
+
+            waitForVisibility(modalLocator);
+
+            WebElement saveButton = waitForClickability(saveButtonLocator);
+            safeClick(saveButton);
+
+            isInvisibleOrAbsent(modalLocator);
+            return true;
+
+        } catch (TimeoutException e) {
+            // Modal never appeared within 5 seconds
+            return false;
+        }
+    }
 
 
 //     ------------------- OurChannels Section Methods -------------------
@@ -269,8 +342,7 @@ public class HomePage extends BasePage {
         MUBASHER("//a[@href='https://www.aljazeeramubasher.net/']"),
         DOCUMENTARY("//a[@href='http://doc.aljazeera.net/']"),
         BALKANS("//a[@href='http://balkans.aljazeera.net/']"),
-        AJ_PLUS("//a[@href='http://ajplus.net/']")
-        ;
+        AJ_PLUS("//a[@href='http://ajplus.net/']");
 
         private final String xpath;
 
@@ -292,9 +364,8 @@ public class HomePage extends BasePage {
      * @return WebElement of the 'Our Channels' header
      */
     public WebElement getOurChannelsHeader() {
-        return driver.findElement(ourChannelsHeader);
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(ourChannelsHeader));
     }
-
 
     /**
      * Returns the WebElement for a specific 'Our Channels' link.
@@ -303,7 +374,7 @@ public class HomePage extends BasePage {
      * @return WebElement of the link.
      */
     public WebElement getOurChannelLink(OurChannels channel) {
-        return driver.findElement(channel.getLocator());
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(channel.getLocator()));
     }
 
 }

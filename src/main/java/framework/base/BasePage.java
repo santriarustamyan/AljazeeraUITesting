@@ -223,5 +223,15 @@ public abstract class BasePage {
     public void scrollToBottom() {
         ((JavascriptExecutor) driver).executeScript("window.scrollTo(0, document.body.scrollHeight);");
     }
+    /**
+     * Waits until the page title is not empty.
+     */
+    public void waitForTitleNotEmpty() {
+        new WebDriverWait(driver, Duration.ofSeconds(10))
+                .until(d -> {
+                    String title = d.getTitle();
+                    return title != null && !title.trim().isEmpty();
+                });
+    }
 
 }
