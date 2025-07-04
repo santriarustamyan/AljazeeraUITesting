@@ -120,6 +120,9 @@ public class HomePage extends BasePage {
     // 'About' footer section header
     private final By aboutSectionHeader = By.xpath("(//ul[@class='menu footer-menu']//li[@class='menu__item menu__item--aje menu__item--has-submenu']//h2)[1]");
 
+    // 'Connect' footer section header
+    private final By connectSectionHeader = By.xpath("(//ul[@class='menu footer-menu']//li[@class='menu__item menu__item--aje menu__item--has-submenu']//h2)[2]");
+
     // 'Our Channels' footer section header
     private final By ourChannelsHeader = By.xpath("(//ul[@class='menu footer-menu']//li[@class='menu__item menu__item--aje menu__item--has-submenu']//h2)[3]");
 
@@ -298,7 +301,6 @@ public class HomePage extends BasePage {
      * Returns a specific link WebElement from the 'About' section.
      */
     public WebElement getAboutLink(AboutLinks link) {
-        waitForPresence(link.getLocator());
         return wait.until(ExpectedConditions.visibilityOfElementLocated(link.getLocator()));
     }
 
@@ -330,6 +332,46 @@ public class HomePage extends BasePage {
         }
     }
 
+// ------------------- Connect Section -------------------
+
+    /**
+     * Enum representing footer 'Connect' section links.
+     */
+    public enum ConnectLinks {
+        CONTACT_US("//a[@href='https://network.aljazeera.net/en/contact?tid=6']"),
+        USER_ACCOUNTS_HELP("//a[@href='https://www.aljazeera.com/user-accounts-help']"),
+        ADVERTISE_WITH_US("//a[@href='https://commercial.aljazeera.net/']"),
+        STAY_CONNECTED("//a[@href='/stay-connected']"),
+        NEWSLETTERS("//a[@href='/newsletters']"),
+        CHANNEL_FINDER("//a[@href='https://sat.aljazeera.net/en']"),
+        TV_SCHEDULE("//a[@href='/schedule/']"),
+        PODCASTS("//a[@href='/podcasts/']"),
+        SUBMIT_A_TIP("//a[@href='https://webapps.aljazeera.net/aje/tips/']");
+
+        private final String xpath;
+
+        ConnectLinks(String xpath) {
+            this.xpath = xpath;
+        }
+
+        public By getLocator() {
+            return By.xpath(xpath);
+        }
+    }
+
+    /**
+     * Returns the header WebElement of the 'Connect' section.
+     */
+    public WebElement getConnectSectionHeader() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(connectSectionHeader));
+    }
+
+    /**
+     * Returns a specific link WebElement from the 'Connect' section.
+     */
+    public WebElement getConnectLink(ConnectLinks link) {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(link.getLocator()));
+    }
 
 //     ------------------- OurChannels Section Methods -------------------
 
