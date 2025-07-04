@@ -126,6 +126,9 @@ public class HomePage extends BasePage {
     // 'Our Channels' footer section header
     private final By ourChannelsHeader = By.xpath("(//ul[@class='menu footer-menu']//li[@class='menu__item menu__item--aje menu__item--has-submenu']//h2)[3]");
 
+    // 'Our Network' footer section header
+    private final By ourNetworkSectionHeader = By.xpath("(//ul[@class='menu footer-menu']//li[@class='menu__item menu__item--aje menu__item--has-submenu']//h2)[4]");
+
     private int lastRandomIndex = -1;
 
     // ------------------- Menu Methods -------------------
@@ -418,6 +421,44 @@ public class HomePage extends BasePage {
      */
     public WebElement getOurChannelLink(OurChannels channel) {
         return wait.until(ExpectedConditions.visibilityOfElementLocated(channel.getLocator()));
+    }
+
+// ------------------- Our Network Section -------------------
+
+    /**
+     * Enum representing footer 'Our Network' section links.
+     */
+    public enum OurNetworkLinks {
+        CENTRE_FOR_STUDIES("//a[@href='http://studies.aljazeera.net/en/']"),
+        MEDIA_INSTITUTE("//a[@href='http://training.aljazeera.net/']"),
+        LEARN_ARABIC("//a[@href='http://learning.aljazeera.net/']"),
+        CENTRE_FOR_PUBLIC_LIBERTIES("//a[@href='http://liberties.aljazeera.com/en']"),
+        FORUM("//a[@href='http://forum.aljazeera.net/']"),
+        HOTEL_PARTNERS("//a[@href='https://hotels.aljazeera.net/en']");
+
+        private final String xpath;
+
+        OurNetworkLinks(String xpath) {
+            this.xpath = xpath;
+        }
+
+        public By getLocator() {
+            return By.xpath(xpath);
+        }
+    }
+
+    /**
+     * Returns the header WebElement of the 'Our Network' section.
+     */
+    public WebElement getOurNetworkSectionHeader() {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(ourNetworkSectionHeader));
+    }
+
+    /**
+     * Returns a specific link WebElement from the 'Our Network' section.
+     */
+    public WebElement getOurNetworkLink(OurNetworkLinks link) {
+        return wait.until(ExpectedConditions.visibilityOfElementLocated(link.getLocator()));
     }
 
 }
