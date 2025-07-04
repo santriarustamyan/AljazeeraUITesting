@@ -298,6 +298,7 @@ public class HomePage extends BasePage {
      * Returns a specific link WebElement from the 'About' section.
      */
     public WebElement getAboutLink(AboutLinks link) {
+        waitForPresence(link.getLocator());
         return wait.until(ExpectedConditions.visibilityOfElementLocated(link.getLocator()));
     }
 
