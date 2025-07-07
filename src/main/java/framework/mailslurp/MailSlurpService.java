@@ -7,6 +7,9 @@ import com.mailslurp.clients.Configuration;
 import com.mailslurp.models.Email;
 import com.mailslurp.models.InboxDto;
 import framework.config.Config;
+import io.qameta.allure.Allure;
+
+import java.util.UUID;
 
 /**
  * Service class to interact with MailSlurp API for creating inboxes and fetching emails.
@@ -54,5 +57,21 @@ public class MailSlurpService {
                 .timeout(60_000L)
                 .unreadOnly(true)
                 .execute();
+    }
+
+    /**
+     * Deletes the inbox by its ID.
+     *
+     * @param inboxId The UUID of the inbox to delete, as String.
+     */
+    public void deleteInbox(UUID inboxId) {
+        Allure.step("Deleting MailSlurp inbox with ID: " + inboxId);
+        try {
+            inboxApi.deleteInbox(inboxId);
+            Allure.step("Inbox successfully deleted: " + inboxId);
+        } catch (Exception e) {
+            Allure.step("Failed to delete inbox: " + inboxId + ". Reason: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 }

@@ -16,6 +16,8 @@ import org.testng.Assert;
 import org.testng.annotations.*;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Test suite for verifying the user sign-up flow, including email verification.
@@ -28,64 +30,123 @@ public class SignUpTest extends BaseTest {
 
     private HomePage homePage;
     private SignUpPage signUpPage;
-    private MailSlurpService mailSlurpService;
-    private InboxDto inbox;
+    private static MailSlurpService mailSlurpService;
+    private final List<InboxDto> createdInboxes = new ArrayList<>();
 
     /**
-     * Setup before each test: initialize driver and page objects.
+     * Initialize MailSlurp service once per class.
+     */
+    @BeforeClass(alwaysRun = true)
+    public void beforeClass() {
+        mailSlurpService = new MailSlurpService();
+    }
+
+    /**
+     * Initialize WebDriver and page objects before each test.
      */
     @BeforeMethod(alwaysRun = true)
     public void setUp() {
         startDriver("desktop");
         homePage = new HomePage(driver);
         signUpPage = new SignUpPage(driver);
-        mailSlurpService = new MailSlurpService();
+    }
+
+    /**
+     * Data provider generating dynamic inboxes and passwords.
+     */
+    @DataProvider(name = "signupCredentials")
+    public Object[][] signupCredentialsProvider() throws Exception {
+        InboxDto inbox1 = createInbox();
+        InboxDto inbox2 = createInbox();
+
+        return new Object[][]{
+                {inbox1, inbox1.getEmailAddress(), TestDataGenerator.generatePassword()},
+                {inbox2, inbox2.getEmailAddress(), TestDataGenerator.generatePassword()}
+        };
+    }
+
+    /**
+     * Creates and stores a new inbox for cleanup.
+     */
+    @Step("Create new MailSlurp inbox")
+    private InboxDto createInbox() throws Exception {
+        InboxDto inbox = mailSlurpService.createInbox();
+        createdInboxes.add(inbox);
+        return inbox;
+    }
+
+    /**
+     * Cleanup created inboxes after each test to avoid clutter.
+     */
+    @AfterMethod(alwaysRun = true)
+    public void cleanUpInboxes() {
+        for (InboxDto inbox : createdInboxes) {
+            mailSlurpService.deleteInbox(inbox.getId());
+        }
+        createdInboxes.clear();
     }
 
     /**
      * Verifies the full sign-up flow including form submission and email verification.
+     *
+     * @param inbox        MailSlurp inbox instance
+     * @param emailAddress Generated email address
+     * @param password     Generated password
      */
-    @Test(description = "Verify Sign Up flow with email verification")
+    @Test(
+            description = "Verify Sign Up flow with email verification",
+            dataProvider = "signupCredentials"
+    )
     @Story("Email verification")
     @Description("Test the full sign-up flow including form submission and email verification")
     @Severity(SeverityLevel.CRITICAL)
-    public void verifySignUpFlow() throws Exception {
+    public void verifySignUpFlow(InboxDto inbox, String emailAddress, String password) throws Exception {
 
-        Allure.step("Create new MailSlurp inbox");
-        inbox = mailSlurpService.createInbox();
-        String email = inbox.getEmailAddress();
-        String password = TestDataGenerator.generatePassword();
+        openSignUpPage();
 
-        Allure.step("Navigate to Sign Up page");
+        fillAndSubmitSignUpForm(emailAddress, password);
+
+        Email verificationEmail = waitForVerificationEmail(inbox);
+
+        String verificationLink = extractVerificationLink(verificationEmail);
+
+        verifyEmailLinkNavigatesToOnboarding(verificationLink);
+    }
+
+    @Step("Navigate to Sign Up page")
+    private void openSignUpPage() {
         homePage.clickMainMenu(HomePage.MainMenu.SIGNUP);
+    }
 
-        Allure.step("Fill Sign Up form with email: " + email);
+    @Step("Fill Sign Up form and submit it")
+    private void fillAndSubmitSignUpForm(String email, String password) {
         signUpPage.fillSignUpForm(email, password);
-
-        Allure.step("Submit Sign Up form");
         signUpPage.submitForm();
+    }
 
-        Allure.step("Wait for verification email");
-        Email emailReceived = mailSlurpService.waitForLatestEmail(inbox);
-
-        Allure.step("Assert that verification email was received");
-        Assert.assertNotNull(emailReceived, "No verification email received");
+    @Step("Wait for verification email to arrive")
+    private Email waitForVerificationEmail(InboxDto inbox) throws Exception {
+        Email email = mailSlurpService.waitForLatestEmail(inbox);
+        Assert.assertNotNull(email, "Verification email was not received");
         Assert.assertTrue(
-                emailReceived.getSubject().toLowerCase().contains("verify"),
-                "Verification email subject is incorrect: " + emailReceived.getSubject()
+                email.getSubject().toLowerCase().contains("verify"),
+                "Unexpected email subject: " + email.getSubject()
         );
+        return email;
+    }
 
-        Allure.step("Extract verification link from email");
-        String verificationLink = EmailParser.extractVerificationLink(emailReceived);
+    @Step("Extract verification link from email")
+    private String extractVerificationLink(Email email) {
+        return EmailParser.extractVerificationLink(email);
+    }
 
-        Allure.step("Navigate to verification link");
+    @Step("Navigate to verification link and assert onboarding page is displayed")
+    private void verifyEmailLinkNavigatesToOnboarding(String verificationLink) {
         driver.navigate().to(verificationLink);
 
-        Allure.step("Wait for onboarding page URL");
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
         wait.until(ExpectedConditions.urlContains("/onboarding/newsletters"));
 
-        Allure.step("Assert that verification succeeded");
         Assert.assertTrue(
                 driver.getCurrentUrl().contains("/onboarding/newsletters"),
                 "Verification failed: unexpected URL " + driver.getCurrentUrl()

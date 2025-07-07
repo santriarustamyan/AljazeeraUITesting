@@ -4,11 +4,14 @@ import framework.pages.HomePage;
 import framework.tests.basePage.BaseTest;
 import io.qameta.allure.*;
 import io.qameta.allure.testng.Tag;
-import org.testng.annotations.*;
-import org.testng.asserts.SoftAssert;
+import org.testng.Assert;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 /**
- * This test verifies that all main and sub menu items on the homepage are visible and have correct labels.
+ * This test verifies that all main and sub menu items on the homepage
+ * are visible and have correct labels.
  */
 @Epic("Navigation")
 @Feature("Main Menu")
@@ -18,55 +21,113 @@ public class MainMenuTest extends BaseTest {
 
     private HomePage homePage;
 
-    /**
-     * Initializes WebDriver and opens the home page before each test.
-     */
-    @BeforeMethod
+    @BeforeMethod(alwaysRun = true)
     public void setUp() {
         startDriver("desktop");
         homePage = new HomePage(driver);
     }
 
     /**
-     * Verifies text labels of main menu and submenu items.
+     * DataProvider for main menu items and their expected labels.
      */
-    @Test(description = "Verify visibility and correctness of all main and submenu items on the homepage.")
-    @Story("Verify main and sub menus are displayed correctly")
-    @Description("Asserts visibility and correctness of main and submenu items on the homepage")
+    @DataProvider(name = "mainMenuItems")
+    public Object[][] provideMainMenuItems() {
+        return new Object[][]{
+                {HomePage.MainMenu.NEWS, "News"},
+                {HomePage.MainMenu.MIDDLE_EAST, "Middle East"},
+                {HomePage.MainMenu.EXPLAINED, "Explained"},
+                {HomePage.MainMenu.OPINION, "Opinion"},
+                {HomePage.MainMenu.SPORT, "Sport"},
+                {HomePage.MainMenu.VIDEO, "Video"},
+                {HomePage.MainMenu.MORE, "More"}
+        };
+    }
+
+    /**
+     * Verifies that each main menu item is visible and has the correct label.
+     */
+    @Test(dataProvider = "mainMenuItems", description = "Verify each main menu item is visible and has correct text.")
+    @Story("Main menu items visibility and labels")
     @Severity(SeverityLevel.NORMAL)
-    public void verifyMainAndSubMenus() {
-        SoftAssert softAssert = new SoftAssert();
+    @Description("Checks that every main menu item is visible and displays the expected text.")
+    public void verifyMainMenuItem(HomePage.MainMenu menu, String expectedLabel) {
+        Allure.step("Verifying main menu item: " + expectedLabel);
+        String actualLabel = homePage.getMainMenuText(menu);
+        Assert.assertEquals(
+                actualLabel,
+                expectedLabel,
+                "Main menu label mismatch for: " + expectedLabel
+        );
+    }
 
-        // Main Menu Items
-        softAssert.assertEquals(homePage.getMainMenuText(HomePage.MainMenu.NEWS), "News", "Main menu: News");
-        softAssert.assertEquals(homePage.getMainMenuText(HomePage.MainMenu.MIDDLE_EAST), "Middle East", "Main menu: Middle East");
-        softAssert.assertEquals(homePage.getMainMenuText(HomePage.MainMenu.EXPLAINED), "Explained", "Main menu: Explained");
-        softAssert.assertEquals(homePage.getMainMenuText(HomePage.MainMenu.OPINION), "Opinion", "Main menu: Opinion");
-        softAssert.assertEquals(homePage.getMainMenuText(HomePage.MainMenu.SPORT), "Sport", "Main menu: Sport");
-        softAssert.assertEquals(homePage.getMainMenuText(HomePage.MainMenu.VIDEO), "Video", "Main menu: Video");
-        softAssert.assertEquals(homePage.getMainMenuText(HomePage.MainMenu.MORE), "More", "Main menu: More");
+    /**
+     * DataProvider for News submenu items.
+     */
+    @DataProvider(name = "newsSubMenuItems")
+    public Object[][] provideNewsSubMenuItems() {
+        return new Object[][]{
+                {HomePage.NewsSubMenu.AFRICA, "Africa"},
+                {HomePage.NewsSubMenu.ASIA, "Asia"},
+                {HomePage.NewsSubMenu.US_CANADA, "US & Canada"},
+                {HomePage.NewsSubMenu.LATIN_AMERICA, "Latin America"},
+                {HomePage.NewsSubMenu.EUROPE, "Europe"},
+                {HomePage.NewsSubMenu.ASIA_PACIFIC, "Asia Pacific"}
+        };
+    }
 
-        // News Submenu
+    /**
+     * Verifies that each News submenu item is visible and has the correct label.
+     */
+    @Test(dataProvider = "newsSubMenuItems", description = "Verify each News submenu item label.")
+    @Story("News submenu items")
+    @Severity(SeverityLevel.NORMAL)
+    @Description("Checks that each News submenu item is visible and has the correct text.")
+    public void verifyNewsSubMenuItem(HomePage.NewsSubMenu submenu, String expectedLabel) {
+        Allure.step("Opening News submenu");
         homePage.clickMainMenu(HomePage.MainMenu.NEWS);
-        softAssert.assertEquals(homePage.getNewsSubMenuText(HomePage.NewsSubMenu.AFRICA), "Africa", "News submenu: Africa");
-        softAssert.assertEquals(homePage.getNewsSubMenuText(HomePage.NewsSubMenu.ASIA), "Asia", "News submenu: Asia");
-        softAssert.assertEquals(homePage.getNewsSubMenuText(HomePage.NewsSubMenu.US_CANADA), "US & Canada", "News submenu: US & Canada");
-        softAssert.assertEquals(homePage.getNewsSubMenuText(HomePage.NewsSubMenu.LATIN_AMERICA), "Latin America", "News submenu: Latin America");
-        softAssert.assertEquals(homePage.getNewsSubMenuText(HomePage.NewsSubMenu.EUROPE), "Europe", "News submenu: Europe");
-        softAssert.assertEquals(homePage.getNewsSubMenuText(HomePage.NewsSubMenu.ASIA_PACIFIC), "Asia Pacific", "News submenu: Asia Pacific");
+        Allure.step("Verifying News submenu item: " + expectedLabel);
+        String actualLabel = homePage.getNewsSubMenuText(submenu);
+        Assert.assertEquals(
+                actualLabel,
+                expectedLabel,
+                "News submenu label mismatch for: " + expectedLabel
+        );
+    }
 
-        // More Submenu
+    /**
+     * DataProvider for More submenu items.
+     */
+    @DataProvider(name = "moreSubMenuItems")
+    public Object[][] provideMoreSubMenuItems() {
+        return new Object[][]{
+                {HomePage.MoreSubMenu.FEATURES, "Features"},
+                {HomePage.MoreSubMenu.ECONOMY, "Economy"},
+                {HomePage.MoreSubMenu.HUMAN_RIGHTS, "Human Rights"},
+                {HomePage.MoreSubMenu.CLIMATE_CRISIS, "Climate Crisis"},
+                {HomePage.MoreSubMenu.INVESTIGATIONS, "Investigations"},
+                {HomePage.MoreSubMenu.INTERACTIVES, "Interactives"},
+                {HomePage.MoreSubMenu.IN_PICTURES, "In Pictures"},
+                {HomePage.MoreSubMenu.SCIENCE_TECHNOLOGY, "Science & Technology"},
+                {HomePage.MoreSubMenu.PODCASTS, "Podcasts"}
+        };
+    }
+
+    /**
+     * Verifies that each More submenu item is visible and has the correct label.
+     */
+    @Test(dataProvider = "moreSubMenuItems", description = "Verify each More submenu item label.")
+    @Story("More submenu items")
+    @Severity(SeverityLevel.NORMAL)
+    @Description("Checks that each More submenu item is visible and has the expected text.")
+    public void verifyMoreSubMenuItem(HomePage.MoreSubMenu submenu, String expectedLabel) {
+        Allure.step("Opening More submenu");
         homePage.clickMainMenu(HomePage.MainMenu.MORE);
-        softAssert.assertEquals(homePage.getMoreSubMenuText(HomePage.MoreSubMenu.FEATURES), "Features", "More submenu: Features");
-        softAssert.assertEquals(homePage.getMoreSubMenuText(HomePage.MoreSubMenu.ECONOMY), "Economy", "More submenu: Economy");
-        softAssert.assertEquals(homePage.getMoreSubMenuText(HomePage.MoreSubMenu.HUMAN_RIGHTS), "Human Rights", "More submenu: Human Rights");
-        softAssert.assertEquals(homePage.getMoreSubMenuText(HomePage.MoreSubMenu.CLIMATE_CRISIS), "Climate Crisis", "More submenu: Climate Crisis");
-        softAssert.assertEquals(homePage.getMoreSubMenuText(HomePage.MoreSubMenu.INVESTIGATIONS), "Investigations", "More submenu: Investigations");
-        softAssert.assertEquals(homePage.getMoreSubMenuText(HomePage.MoreSubMenu.INTERACTIVES), "Interactives", "More submenu: Interactives");
-        softAssert.assertEquals(homePage.getMoreSubMenuText(HomePage.MoreSubMenu.IN_PICTURES), "In Pictures", "More submenu: In Pictures");
-        softAssert.assertEquals(homePage.getMoreSubMenuText(HomePage.MoreSubMenu.SCIENCE_TECHNOLOGY), "Science & Technology", "More submenu: Science & Technology");
-        softAssert.assertEquals(homePage.getMoreSubMenuText(HomePage.MoreSubMenu.PODCASTS), "Podcasts", "More submenu: Podcasts");
-
-        softAssert.assertAll();
+        Allure.step("Verifying More submenu item: " + expectedLabel);
+        String actualLabel = homePage.getMoreSubMenuText(submenu);
+        Assert.assertEquals(
+                actualLabel,
+                expectedLabel,
+                "More submenu label mismatch for: " + expectedLabel
+        );
     }
 }

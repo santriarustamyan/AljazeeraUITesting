@@ -7,11 +7,12 @@ import io.qameta.allure.testng.Tag;
 import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * This test verifies that the 'Connect' section in the homepage footer
- * is visible and each link correctly navigates in the same tab.
+ * This test verifies that each link in the 'Connect' footer section
+ * is visible, enabled, and navigates correctly.
  */
 @Epic("Footer")
 @Feature("'Connect' Section")
@@ -32,81 +33,95 @@ public class ConnectSectionTest extends BaseTest {
     }
 
     /**
-     * Verifies that the 'Connect' section header is visible and each link navigates correctly.
+     * DataProvider supplying all ConnectLinks enum values.
      */
-    @Test(description = "Verify 'Connect' header visibility and correct navigation of each link in the same tab")
+    @DataProvider(name = "connectLinks")
+    public Object[][] provideConnectLinks() {
+        return java.util.Arrays.stream(HomePage.ConnectLinks.values())
+                .map(link -> new Object[]{link})
+                .toArray(Object[][]::new);
+    }
+
+    /**
+     * Verifies that each 'Connect' link is visible, enabled, and navigates correctly.
+     *
+     * @param link the link to validate
+     */
+    @Test(
+            dataProvider = "connectLinks",
+            description = "Verify each 'Connect' footer link navigates correctly in the same tab"
+    )
     @Severity(SeverityLevel.CRITICAL)
-    @Description("Ensures that the 'Connect' section header is displayed, non-clickable, and all footer links work as expected.")
-    public void verifyConnectSectionLinks() {
-        // Scroll to footer
+    @Description("Ensures each 'Connect' footer link is visible, enabled, and navigates to the correct URL with a non-empty title.")
+    public void verifyConnectSectionLink(HomePage.ConnectLinks link) {
+        Allure.step("Scroll to the footer");
         homePage.scrollToBottom();
 
-        // Verify the 'Connect' section header
+        // Verify the 'Connect' section header visibility
         WebElement header = homePage.getConnectSectionHeader();
         Assert.assertTrue(
                 header.isDisplayed(),
-                "'Connect' section header is not visible."
+                "'Connect' section header must be visible."
         );
         Assert.assertNotEquals(
                 header.getTagName(),
                 "a",
-                "'Connect' header must not be a clickable link."
+                "'Connect' section header must not be a clickable link."
         );
 
-        // Iterate over each link in the 'Connect' section
-        for (HomePage.ConnectLinks link : HomePage.ConnectLinks.values()) {
-            homePage.scrollToBottom();
+        // Prepare link
+        WebElement linkElement = homePage.getConnectLink(link);
+        String linkText = linkElement.getText().trim();
+        Allure.step("Validating 'Connect' link: " + linkText);
 
-            WebElement linkElement = homePage.getConnectLink(link);
-            String linkText = linkElement.getText().trim();
-            Allure.step("Validating 'Connect' link: " + linkText);
+        Assert.assertTrue(linkElement.isDisplayed(), "Link '" + linkText + "' must be visible.");
+        Assert.assertTrue(linkElement.isEnabled(), "Link '" + linkText + "' must be enabled.");
 
-            Assert.assertTrue(linkElement.isDisplayed(), "Link '" + linkText + "' must be visible.");
-            Assert.assertTrue(linkElement.isEnabled(), "Link '" + linkText + "' must be enabled.");
+        // Capture expected href
+        String expectedHref = linkElement.getAttribute("href").trim();
 
-            // Get the expected href
-            String expectedHref = linkElement.getAttribute("href").trim();
+        // Act: click the link
+        homePage.safeClick(linkElement);
+        homePage.waitForPageLoaded();
+        homePage.waitForTitleNotEmpty();
 
-            // Click the link
-            homePage.safeClick(linkElement);
-            homePage.waitForPageLoaded();
-            homePage.waitForTitleNotEmpty();
+        String actualUrl = driver.getCurrentUrl().trim();
 
-            // Get the current URL after navigation
-            String actualUrl = driver.getCurrentUrl().trim();
-
-            // Special case for Podcasts redirect
-            if (link == HomePage.ConnectLinks.PODCASTS) {
-                Assert.assertTrue(
-                        actualUrl.contains("/audio/podcasts"),
-                        "Expected podcasts URL to contain '/audio/podcasts' but was: " + actualUrl
-                );
-            } else {
-                // Normalize URLs by removing protocol and www
-                String normalizedExpected = expectedHref
-                        .replaceFirst("^https?://", "")
-                        .replaceFirst("^www\\.", "");
-                String normalizedActual = actualUrl
-                        .replaceFirst("^https?://", "")
-                        .replaceFirst("^www\\.", "");
-
-                Assert.assertTrue(
-                        normalizedActual.startsWith(normalizedExpected),
-                        "Expected URL to start with: " + normalizedExpected + " but was: " + actualUrl
-                );
-            }
-
-            // Verify the page title is not empty
-            Assert.assertFalse(
-                    driver.getTitle().trim().isEmpty(),
-                    "The page title must not be empty."
+        // Special case: Podcasts redirect
+        if (link == HomePage.ConnectLinks.PODCASTS) {
+            Assert.assertTrue(
+                    actualUrl.contains("/audio/podcasts"),
+                    "Expected Podcasts URL to contain '/audio/podcasts' but was: " + actualUrl
             );
+        } else {
+            // Normalize URLs
+            String normalizedExpected = expectedHref
+                    .replaceFirst("^https?://", "")
+                    .replaceFirst("^www\\.", "")
+                    .replaceAll("/$", "");
+            String normalizedActual = actualUrl
+                    .replaceFirst("^https?://", "")
+                    .replaceFirst("^www\\.", "")
+                    .replaceAll("/$", "");
 
-            // Navigate back to the homepage
-            driver.navigate().back();
-            homePage.waitForPageLoaded();
-            homePage.scrollToBottom();
-            homePage.waitUntilVisible(homePage.getConnectSectionHeader());
+            Assert.assertTrue(
+                    normalizedActual.startsWith(normalizedExpected),
+                    "Expected URL to start with: " + normalizedExpected + ", but was: " + actualUrl
+            );
         }
+
+        // Verify page title
+        String pageTitle = driver.getTitle().trim();
+        Allure.step("Page title after navigation: '" + pageTitle + "'");
+        Assert.assertFalse(
+                pageTitle.isEmpty(),
+                "The page title must not be empty. Current URL: " + driver.getCurrentUrl()
+        );
+
+        // Navigate back
+        driver.navigate().back();
+        homePage.waitForPageLoaded();
+        homePage.scrollToBottom();
+        homePage.waitUntilVisible(homePage.getConnectSectionHeader());
     }
 }

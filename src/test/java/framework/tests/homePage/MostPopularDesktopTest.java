@@ -37,8 +37,11 @@ public class MostPopularDesktopTest extends BaseTest {
     @Description("Ensure that the 'Most Popular' section is displayed when viewed on a desktop resolution")
     @Severity(SeverityLevel.NORMAL)
     public void verifyMostPopularSectionIsVisible() {
+        Allure.step("Checking if 'Most Popular' section is displayed on the homepage");
+        boolean isVisible = homePage.isMostPopularVisible();
+
         Assert.assertTrue(
-                homePage.isMostPopularVisible(),
+                isVisible,
                 "'Most Popular' section is not visible on Desktop."
         );
     }
@@ -51,7 +54,10 @@ public class MostPopularDesktopTest extends BaseTest {
     @Description("Ensure that there are exactly 10 articles listed in the 'Most Popular' section")
     @Severity(SeverityLevel.MINOR)
     public void verifyTrendingArticlesCountIsTen() {
+        Allure.step("Retrieving number of posts in 'Most Popular' section");
         int actualCount = homePage.getMostPopularPostsCount();
+
+        Allure.step("Validating that there are exactly 10 posts (found: " + actualCount + ")");
         Assert.assertEquals(
                 actualCount,
                 10,

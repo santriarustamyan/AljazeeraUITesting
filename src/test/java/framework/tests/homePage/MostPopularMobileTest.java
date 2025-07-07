@@ -36,7 +36,12 @@ public class MostPopularMobileTest extends BaseTest {
     @Description("Verify that the 'Most Popular' section is hidden when viewing the site on a mobile device")
     @Severity(SeverityLevel.NORMAL)
     public void verifyMostPopularSectionNotVisibleOnMobile() {
-        Assert.assertTrue(homePage.isMostPopularInvisibleOrAbsent(), "'Most Popular' section should not be visible on mobile.");
+        Allure.step("Checking that 'Most Popular' section is not visible in mobile mode");
+        boolean notVisible = homePage.isMostPopularInvisibleOrAbsent();
 
+        Assert.assertTrue(
+                notVisible,
+                "'Most Popular' section should not be visible on mobile."
+        );
     }
 }

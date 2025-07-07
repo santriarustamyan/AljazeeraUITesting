@@ -43,29 +43,36 @@ public class MostPopularAccessibilityTest extends BaseTest {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
         Actions actions = new Actions(driver);
 
-        // Optionally click the link if visible (depends on implementation)
+        Allure.step("Optionally click the skip link if it's visible");
         homePage.clickSkipToMostReadLink();
 
-        // Send TAB keys to focus the skip link and then ENTER
+        Allure.step("Sending TAB keys to focus the skip link");
         actions.sendKeys(Keys.TAB)
                 .sendKeys(Keys.TAB)
                 .sendKeys(Keys.TAB)
-                .sendKeys(Keys.ENTER)
                 .perform();
 
-        // Send an extra ENTER if needed (some implementations require double confirm)
+        Allure.step("Sending ENTER key to activate the skip link");
         actions.sendKeys(Keys.ENTER).perform();
 
-        // Wait for URL fragment to appear
+        Allure.step("Sending an extra ENTER to ensure activation (if needed)");
+        actions.sendKeys(Keys.ENTER).perform();
+
+        Allure.step("Waiting for URL fragment '#most-read-container' to appear");
         wait.until(ExpectedConditions.urlContains("#most-read-container"));
 
         String currentUrl = driver.getCurrentUrl();
+        Allure.step("Validating that URL contains the expected fragment: " + currentUrl);
         Assert.assertNotNull(currentUrl, "Current URL is null after activating skip link");
-        Assert.assertTrue(currentUrl.contains("#most-read-container"),
-                "URL did not change after activating the Bypass Block link");
+        Assert.assertTrue(
+                currentUrl.contains("#most-read-container"),
+                "URL did not change after activating the Bypass Block link"
+        );
 
-        // Verify the section is visible
-        Assert.assertTrue(homePage.isMostPopularVisible(),
-                "Most Popular section is not visible after keyboard navigation");
+        Allure.step("Verifying that the Most Popular section is visible");
+        Assert.assertTrue(
+                homePage.isMostPopularVisible(),
+                "Most Popular section is not visible after keyboard navigation"
+        );
     }
 }

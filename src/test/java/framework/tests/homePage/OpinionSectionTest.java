@@ -21,10 +21,10 @@ public class OpinionSectionTest extends BaseTest {
     private HomePage homePage;
 
     /**
-     * Initializes the driver and loads the homepage before each test.
+     * Initializes the WebDriver and loads the homepage before each test.
      */
     @BeforeMethod(alwaysRun = true)
-    public void setup() {
+    public void setUp() {
         startDriver("desktop");
         homePage = new HomePage(driver);
     }
@@ -32,63 +32,69 @@ public class OpinionSectionTest extends BaseTest {
     /**
      * Verifies that the Opinion section is visible and contains exactly six posts.
      */
-    @Test(description = "Verify Opinion section is visible and contains exactly 6 posts")
+    @Test(
+            description = "Verify that the Opinion section is visible and contains exactly 6 posts"
+    )
     @Story("Opinion Section Visibility and Count")
-    @Description("Ensure that the Opinion section is displayed and displays exactly six posts on the homepage")
+    @Description("Ensure that the Opinion section is displayed and contains exactly six posts on the homepage")
     @Severity(SeverityLevel.NORMAL)
     public void verifyOpinionSectionVisibleAndContainsSixPosts() {
-        Allure.step("Ensure Opinion section is loaded and visible");
+        Allure.step("Scroll to the Opinion section and verify it is visible");
         homePage.ensureOpinionSectionVisible();
-        Allure.step("Check that the Opinion section is visible");
         Assert.assertTrue(
                 homePage.isOpinionSectionVisible(),
-                "Opinion section must be visible"
+                "Opinion section must be visible."
         );
 
-        Allure.step("Check that there are exactly 6 posts in the Opinion section");
+        Allure.step("Verify that exactly 6 posts are displayed in the Opinion section");
         int postCount = homePage.getOpinionPostCount();
         Assert.assertEquals(
                 postCount,
                 6,
-                "Opinion section should contain exactly 6 posts"
+                "Expected exactly 6 posts in the Opinion section."
         );
     }
 
     /**
-     * Verifies that the creator name and the URL are consistent when navigating to the article page.
+     * Verifies that the creator name and URL are consistent when navigating to the article page.
      */
-    @Test(description = "Verify title and author match between card and article")
+    @Test(
+            description = "Verify that the creator name and title match between the card and article page"
+    )
     @Story("Opinion Post Details Consistency")
-    @Description("Verify that the creator name displayed in the Opinion card matches the author on the article page and that URL is correct")
+    @Description("Ensure that the creator name on the Opinion card matches the author on the article page, and that the URL is correct")
     @Severity(SeverityLevel.CRITICAL)
     public void verifyArticleTitleAndAuthorMatchAfterClick() {
-        Allure.step("Ensure Opinion section is loaded and visible");
+        Allure.step("Ensure the Opinion section is visible");
         homePage.ensureOpinionSectionVisible();
 
-        Allure.step("Get random creator name from Opinion section card");
-        String creatorBeforeClick = homePage.getRandomCreatorName();
+        Allure.step("Get the creator name from a random Opinion post card");
+        String creatorBeforeClick = homePage.getRandomCreatorName().trim();
 
-        Allure.step("Click on the random post from Opinion section");
+        Allure.step("Click a random Opinion post card");
         homePage.clickRandomPost();
 
-        Allure.step("Create OpinionsPostPage object");
+        Allure.step("Create an OpinionsPostPage instance to validate article details");
         OpinionsPostPage postPage = new OpinionsPostPage(driver);
 
-        Allure.step("Get creator name from the article page");
+        Allure.step("Get the creator name displayed on the article page");
         String creatorAfterClick = postPage.getCreatorName().trim();
 
-        Allure.step("Verify that creator names match");
+        Allure.step("Validate that the creator names match between the card and article");
         Assert.assertTrue(
                 creatorAfterClick.toLowerCase().contains(creatorBeforeClick.toLowerCase()),
-                String.format("Creator name after click [%s] should contain the name before click [%s]",
-                        creatorAfterClick, creatorBeforeClick)
+                String.format(
+                        "Expected the creator name [%s] on the article page to contain [%s]",
+                        creatorAfterClick,
+                        creatorBeforeClick
+                )
         );
 
-        Allure.step("Verify that URL contains '/opinions/'");
-        String currentUrl = driver.getCurrentUrl();
+        Allure.step("Validate that the URL contains '/opinions/'");
+        String currentUrl = driver.getCurrentUrl().trim();
         Assert.assertTrue(
                 currentUrl.contains("/opinions/"),
-                "URL does not contain '/opinions/' as expected"
+                "Expected the URL to contain '/opinions/'. Actual URL: " + currentUrl
         );
     }
 }

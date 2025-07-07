@@ -7,14 +7,16 @@ import io.qameta.allure.testng.Tag;
 import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * This test verifies that the 'About' section in the homepage footer
- * is visible, non-clickable, and each link correctly navigates.
+ * This test verifies that each link in the 'About' footer section
+ * is visible and navigates correctly.
  */
 @Epic("Footer")
 @Feature("'About' Section")
+@Story("Validate 'About' footer section")
 @Owner("Santri")
 @Tag("UI")
 public class AboutSectionTest extends BaseTest {
@@ -31,86 +33,99 @@ public class AboutSectionTest extends BaseTest {
     }
 
     /**
-     * Verifies the 'About' section header visibility and links' navigation.
+     * DataProvider supplying all AboutLinks enum values.
      */
-    @Test(description = "Verify 'About' header is visible and links navigate correctly in the same tab")
-    @Story("Validate 'About' footer section")
-    @Description("Ensures 'About' header is visible and each link navigates properly in the same tab.")
+    @DataProvider(name = "aboutLinks")
+    public Object[][] provideAboutLinks() {
+        return java.util.Arrays.stream(HomePage.AboutLinks.values())
+                .map(link -> new Object[]{link})
+                .toArray(Object[][]::new);
+    }
+
+    /**
+     * Verifies that each 'About' link is visible, enabled, and navigates correctly.
+     *
+     * @param link the link to validate
+     */
+    @Test(
+            dataProvider = "aboutLinks",
+            description = "Verify each 'About' footer link navigates correctly in the same tab"
+    )
     @Severity(SeverityLevel.CRITICAL)
-    public void verifyAboutSectionLinks() {
-        // Scroll to footer
+    @Description("Ensures each 'About' footer link is visible, enabled, and navigates to the correct URL with a non-empty title.")
+    public void verifyAboutSectionLink(HomePage.AboutLinks link) {
+        Allure.step("Scroll to the footer");
         homePage.scrollToBottom();
 
-        // Verify header
+        // Verify header visibility
         WebElement header = homePage.getAboutSectionHeader();
         Assert.assertTrue(
                 header.isDisplayed(),
-                "'About' section header is not visible."
+                "'About' section header must be visible."
         );
         Assert.assertNotEquals(
                 header.getTagName(),
                 "a",
-                "'About' header must not be a clickable link."
+                "'About' section header must not be a clickable link."
         );
 
-        // Iterate over each link
-        for (HomePage.AboutLinks link : HomePage.AboutLinks.values()) {
-            homePage.scrollToBottom();
+        // Prepare link
+        WebElement linkElement = homePage.getAboutLink(link);
+        String linkText = linkElement.getText().trim();
+        Allure.step("Validating 'About' link: " + linkText);
 
-            WebElement linkElement = homePage.getAboutLink(link);
-            String linkText = linkElement.getText().trim();
-            Allure.step("Validating about link: " + linkText);
+        Assert.assertTrue(linkElement.isDisplayed(), "Link '" + linkText + "' must be visible.");
+        Assert.assertTrue(linkElement.isEnabled(), "Link '" + linkText + "' must be enabled.");
 
-            Assert.assertTrue(linkElement.isDisplayed(), "Link '" + linkText + "' must be visible.");
-            Assert.assertTrue(linkElement.isEnabled(), "Link '" + linkText + "' must be enabled.");
-
-
-            // Special case: Cookie Preferences opens a pop-up
-            if (link == HomePage.AboutLinks.COOKIE_PREFERENCES) {
-
-                homePage.safeClick(linkElement);
-                boolean wasClosed = homePage.closeCookiePreferencesModalIfPresent();
-                Allure.step("Cookie preferences modal closed: " + wasClosed);
-                Assert.assertTrue(wasClosed, "Cookie preferences modal should have appeared and been closed.");
-                continue;
-            }
-            // Expected href
-            String expectedHref = linkElement.getAttribute("href").trim();
-
-            // Click link
+        // Special case: Cookie Preferences modal
+        if (link == HomePage.AboutLinks.COOKIE_PREFERENCES) {
+            Allure.step("Opening Cookie Preferences modal");
             homePage.safeClick(linkElement);
-            homePage.waitForPageLoaded();
-
-            homePage.waitForTitleNotEmpty();
-
-            String actualUrl = driver.getCurrentUrl().trim();
-
-            // Normalize URL to avoid protocol and www differences
-            String normalizedExpected = expectedHref
-                    .replaceFirst("^https?://", "")
-                    .replaceFirst("^www\\.", "");
-            String normalizedActual = actualUrl
-                    .replaceFirst("^https?://", "")
-                    .replaceFirst("^www\\.", "");
-
+            boolean wasClosed = homePage.closeCookiePreferencesModalIfPresent();
+            Allure.step("Cookie Preferences modal closed: " + wasClosed);
             Assert.assertTrue(
-                    normalizedActual.startsWith(normalizedExpected),
-                    "Expected URL to start with: " + normalizedExpected + " but was: " + actualUrl
+                    wasClosed,
+                    "Cookie Preferences modal should have appeared and been closed."
             );
-
-            String pageTitle = driver.getTitle().trim();
-            Allure.step("Page title after navigation: '" + pageTitle + "'");
-            Assert.assertFalse(
-                    pageTitle.isEmpty(),
-                    "The page title must not be empty. Current URL: " + driver.getCurrentUrl()
-            );
-
-            // Navigation back or reopen homepage
-            driver.navigate().back();
-            homePage.waitForPageLoaded();
-            homePage.scrollToBottom();
-
-            homePage.waitUntilVisible(homePage.getAboutSectionHeader());
+            return; // Skip further checks for this case
         }
+
+        // Expected href
+        String expectedHref = linkElement.getAttribute("href").trim();
+
+        // Act
+        homePage.safeClick(linkElement);
+        homePage.waitForPageLoaded();
+        homePage.waitForTitleNotEmpty();
+
+        // Assert URL
+        String actualUrl = driver.getCurrentUrl().trim();
+        String normalizedExpected = expectedHref
+                .replaceFirst("^https?://", "")
+                .replaceFirst("^www\\.", "")
+                .replaceAll("/$", "");
+        String normalizedActual = actualUrl
+                .replaceFirst("^https?://", "")
+                .replaceFirst("^www\\.", "")
+                .replaceAll("/$", "");
+
+        Assert.assertTrue(
+                normalizedActual.startsWith(normalizedExpected),
+                "Expected URL to start with: " + normalizedExpected + ", but was: " + actualUrl
+        );
+
+        // Assert page title
+        String pageTitle = driver.getTitle().trim();
+        Allure.step("Page title after navigation: '" + pageTitle + "'");
+        Assert.assertFalse(
+                pageTitle.isEmpty(),
+                "The page title must not be empty. Current URL: " + driver.getCurrentUrl()
+        );
+
+        // Navigate back to homepage
+        driver.navigate().back();
+        homePage.waitForPageLoaded();
+        homePage.scrollToBottom();
+        homePage.waitUntilVisible(homePage.getAboutSectionHeader());
     }
 }

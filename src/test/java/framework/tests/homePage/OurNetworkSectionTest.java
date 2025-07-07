@@ -7,11 +7,12 @@ import io.qameta.allure.testng.Tag;
 import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 /**
- * This test verifies that the 'Our Network' section in the homepage footer
- * is visible and that each link navigates correctly in the same tab.
+ * This test verifies that each link in the 'Our Network' footer section
+ * is visible and navigates correctly in the same tab.
  */
 @Epic("Footer")
 @Feature("'Our Network' Section")
@@ -32,13 +33,29 @@ public class OurNetworkSectionTest extends BaseTest {
     }
 
     /**
-     * Verifies the 'Our Network' header visibility and that all links navigate correctly.
+     * DataProvider supplying all OurNetworkLinks enum values.
      */
-    @Test(description = "Verify 'Our Network' header visibility and correct navigation of each link in the same tab")
+    @DataProvider(name = "ourNetworkLinks")
+    public Object[][] provideOurNetworkLinks() {
+        return java.util.Arrays.stream(HomePage.OurNetworkLinks.values())
+                .map(link -> new Object[]{link})
+                .toArray(Object[][]::new);
+    }
+
+    /**
+     * Verifies that the 'Our Network' section header is visible and
+     * that each link navigates correctly.
+     *
+     * @param link the link to validate
+     */
+    @Test(
+            dataProvider = "ourNetworkLinks",
+            description = "Verify each 'Our Network' footer link navigates correctly in the same tab"
+    )
     @Severity(SeverityLevel.CRITICAL)
-    @Description("Ensures that the 'Our Network' section header is displayed, non-clickable, and all footer links open the expected destinations.")
-    public void verifyOurNetworkSectionLinks() {
-        // Scroll to the footer
+    @Description("Ensures that the 'Our Network' section header is displayed, non-clickable, and each footer link opens the expected destination URL with a non-empty title.")
+    public void verifyOurNetworkLinkNavigation(HomePage.OurNetworkLinks link) {
+        Allure.step("Scroll to the footer section");
         homePage.scrollToBottom();
 
         // Verify the 'Our Network' section header
@@ -53,61 +70,59 @@ public class OurNetworkSectionTest extends BaseTest {
                 "'Our Network' header must not be a clickable link."
         );
 
-        // Iterate over each link in the 'Our Network' section
-        for (HomePage.OurNetworkLinks link : HomePage.OurNetworkLinks.values()) {
-            homePage.scrollToBottom();
+        // Prepare the link element
+        WebElement linkElement = homePage.getOurNetworkLink(link);
+        String linkText = linkElement.getText().trim();
+        Allure.step("Validating 'Our Network' link: " + linkText);
 
-            WebElement linkElement = homePage.getOurNetworkLink(link);
-            String linkText = linkElement.getText().trim();
-            Allure.step("Validating 'Our Network' link: " + linkText);
+        Assert.assertTrue(linkElement.isDisplayed(), "Link '" + linkText + "' must be visible.");
+        Assert.assertTrue(linkElement.isEnabled(), "Link '" + linkText + "' must be enabled.");
 
-            Assert.assertTrue(linkElement.isDisplayed(), "Link '" + linkText + "' must be visible.");
-            Assert.assertTrue(linkElement.isEnabled(), "Link '" + linkText + "' must be enabled.");
+        // Capture expected href
+        String expectedHref = linkElement.getAttribute("href").trim();
 
-            // Capture expected href
-            String expectedHref = linkElement.getAttribute("href").trim();
+        // Click the link and wait for navigation
+        homePage.safeClick(linkElement);
+        homePage.waitForPageLoaded();
+        homePage.waitForTitleNotEmpty();
 
-            // Click the link and wait for navigation
-            homePage.safeClick(linkElement);
-            homePage.waitForPageLoaded();
-            homePage.waitForTitleNotEmpty();
+        String actualUrl = driver.getCurrentUrl().trim();
 
-            String actualUrl = driver.getCurrentUrl().trim();
-
-            // Special handling for MEDIA_INSTITUTE redirect
-            if (link == HomePage.OurNetworkLinks.MEDIA_INSTITUTE) {
-                Assert.assertTrue(
-                        actualUrl.contains("institute.aljazeera.net"),
-                        "Expected MEDIA_INSTITUTE URL to contain 'institute.aljazeera.net' but was: " + actualUrl
-                );
-            } else {
-                // Normalize URLs by removing protocol, www, and trailing slashes
-                String normalizedExpected = expectedHref
-                        .replaceFirst("^https?://", "")
-                        .replaceFirst("^www\\.", "")
-                        .replaceAll("/$", "");
-                String normalizedActual = actualUrl
-                        .replaceFirst("^https?://", "")
-                        .replaceFirst("^www\\.", "")
-                        .replaceAll("/$", "");
-
-                Assert.assertTrue(
-                        normalizedActual.startsWith(normalizedExpected),
-                        "Expected URL to start with: " + normalizedExpected + " but was: " + actualUrl
-                );
-            }
-
-            // Verify that the page title is not empty
-            Assert.assertFalse(
-                    driver.getTitle().trim().isEmpty(),
-                    "The page title must not be empty."
+        // Special handling for MEDIA_INSTITUTE redirect
+        if (link == HomePage.OurNetworkLinks.MEDIA_INSTITUTE) {
+            Assert.assertTrue(
+                    actualUrl.contains("institute.aljazeera.net"),
+                    "Expected MEDIA_INSTITUTE URL to contain 'institute.aljazeera.net' but was: " + actualUrl
             );
+        } else {
+            // Normalize URLs by removing protocol, www, and trailing slashes
+            String normalizedExpected = expectedHref
+                    .replaceFirst("^https?://", "")
+                    .replaceFirst("^www\\.", "")
+                    .replaceAll("/$", "");
+            String normalizedActual = actualUrl
+                    .replaceFirst("^https?://", "")
+                    .replaceFirst("^www\\.", "")
+                    .replaceAll("/$", "");
 
-            // Navigate back to the homepage and re-validate the header
-            driver.navigate().back();
-            homePage.waitForPageLoaded();
-            homePage.scrollToBottom();
-            homePage.waitUntilVisible(homePage.getOurNetworkSectionHeader());
+            Assert.assertTrue(
+                    normalizedActual.startsWith(normalizedExpected),
+                    "Expected URL to start with: " + normalizedExpected + " but was: " + actualUrl
+            );
         }
+
+        // Verify that the page title is not empty
+        String pageTitle = driver.getTitle().trim();
+        Allure.step("Page title after navigation: '" + pageTitle + "'");
+        Assert.assertFalse(
+                pageTitle.isEmpty(),
+                "The page title must not be empty."
+        );
+
+        // Navigate back to the homepage for the next iteration
+        driver.navigate().back();
+        homePage.waitForPageLoaded();
+        homePage.scrollToBottom();
+        homePage.waitUntilVisible(homePage.getOurNetworkSectionHeader());
     }
 }
