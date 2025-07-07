@@ -344,7 +344,7 @@ public class HomePage extends BasePage {
         CONTACT_US("//a[@href='https://network.aljazeera.net/en/contact?tid=6']"),
         USER_ACCOUNTS_HELP("//a[@href='https://www.aljazeera.com/user-accounts-help']"),
         ADVERTISE_WITH_US("//a[@href='https://commercial.aljazeera.net/']"),
-        STAY_CONNECTED("//a[@href='/stay-connected']"),
+        STAY_CONNECTED("//a[@href='https://www.aljazeera.com/stay-connected']"),
         NEWSLETTERS("//a[@href='/newsletters']"),
         CHANNEL_FINDER("//a[@href='https://sat.aljazeera.net/en']"),
         TV_SCHEDULE("//a[@href='/schedule/']"),
