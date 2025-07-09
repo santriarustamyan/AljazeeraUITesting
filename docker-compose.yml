@@ -1,0 +1,22 @@
+services:
+  tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: aljazeera-tests
+    volumes:
+      - ./target/allure-results:/app/target/allure-results
+      - ./target/allure-report:/app/target/allure-report
+    env_file:
+      - .env
+    command: >
+      sh -c "mvn test &&
+             allure generate target/allure-results -o target/allure-report --clean"
+
+  report-server:
+    image: nginx:alpine
+    ports:
+      - "8088:80"
+    volumes:
+      - ./target/allure-report:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro

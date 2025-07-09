@@ -24,9 +24,12 @@ public class DriverFactory {
      */
     public static WebDriver getDriver(String mode) {
         if (driver == null) {
-            WebDriverManager.chromedriver().setup();
 
             ChromeOptions options = new ChromeOptions();
+
+            if (!isRunningInDocker()) {
+                WebDriverManager.chromedriver().setup();
+            }
 
             // Suppress "Chrome is being controlled by automated software"
             options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
@@ -78,5 +81,9 @@ public class DriverFactory {
             driver.quit();
             driver = null;
         }
+    }
+    private static boolean isRunningInDocker() {
+        String env = System.getenv("DOCKER");
+        return env != null && env.equalsIgnoreCase("true");
     }
 }

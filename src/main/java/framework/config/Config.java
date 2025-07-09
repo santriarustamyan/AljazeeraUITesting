@@ -1,5 +1,6 @@
 package framework.config;
 
+import io.github.cdimascio.dotenv.Dotenv;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,6 +15,9 @@ public class Config {
 
     private static final Logger logger = LoggerFactory.getLogger(Config.class);
     private static final Properties properties = new Properties();
+    private static final Dotenv dotenv = Dotenv.configure()
+            .ignoreIfMissing()
+            .load();
 
     static {
         try (FileInputStream file = new FileInputStream("src/test/resources/config.properties")) {
@@ -52,6 +56,9 @@ public class Config {
      */
     public static String getMailSlurpApiKey() {
         String key = System.getenv("MAILSLURP_API_KEY");
+        if (key == null || key.isEmpty()) {
+            key = dotenv.get("MAILSLURP_API_KEY");
+        }
         if (key == null || key.isEmpty()) {
             throw new RuntimeException("MAILSLURP_API_KEY environment variable is not set");
         }
