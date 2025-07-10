@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   tests:
     build:
@@ -9,8 +11,10 @@ services:
       - ./target/allure-report:/app/target/allure-report
     env_file:
       - .env
+    environment:
+      - MAILSLURP_API_KEY=${MAILSLURP_API_KEY}
     command: >
-      sh -c "mvn test &&
+      sh -c "xvfb-run --auto-servernum --server-args='-screen 0 1920x1080x24' mvn test &&
              allure generate target/allure-results -o target/allure-report --clean"
 
   report-server:
