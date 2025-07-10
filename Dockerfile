@@ -33,14 +33,6 @@ RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.d
     apt install -y ./google-chrome-stable_current_amd64.deb && \
     rm google-chrome-stable_current_amd64.deb
 
-# Установка ChromeDriver, соответствующего Chrome
-RUN CHROME_VERSION=$(google-chrome --version | grep -oP '\d+\.\d+\.\d+') && \
-    echo "Chrome version: $CHROME_VERSION" && \
-    wget -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/138.0.0/chromedriver_linux64.zip && \
-    unzip /tmp/chromedriver.zip -d /usr/local/bin/ && \
-    chmod +x /usr/local/bin/chromedriver && \
-    rm /tmp/chromedriver.zip
-
 ENV CHROME_BIN=/usr/bin/google-chrome
 ENV PATH="$PATH:/usr/local/bin"
 
