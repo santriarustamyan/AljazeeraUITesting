@@ -14,10 +14,11 @@ RUN apt-get update && \
     ln -s /opt/allure/bin/allure /usr/bin/allure && \
     rm -f allure-2.27.0.tgz
 
-COPY . .
+# Copy test project
+COPY . /app
 
 RUN mvn clean install -DskipTests
 
 EXPOSE 8088
 
-CMD ["sh", "-c", "mvn test && cp -r target/allure-results /app/allure-results && allure generate /app/allure-results -o target/allure-report --clean"]
+CMD ["sh", "-c", "mvn test && cp -r target/allure-results /app/target/allure-results && allure generate /app/target/allure-results -o /app/target/allure-report --clean"]
