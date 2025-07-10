@@ -5,6 +5,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      # Force amd64 platform to work on M1 Macs
+    platform: linux/amd64
     image: aljazeera-tests
     volumes:
       - ./target/allure-results:/app/target/allure-results
