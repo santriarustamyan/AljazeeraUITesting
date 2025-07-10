@@ -9,8 +9,6 @@ services:
     volumes:
       - ./target/allure-results:/app/target/allure-results
       - ./target/allure-report:/app/target/allure-report
-    env_file:
-      - .env
     environment:
       - MAILSLURP_API_KEY=${MAILSLURP_API_KEY}
     command: >
