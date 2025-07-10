@@ -8,16 +8,7 @@ services:
     image: aljazeera-tests
     volumes:
       - ./target/allure-results:/app/target/allure-results
-      - ./target/allure-report:/app/target/allure-report
     environment:
       MAILSLURP_API_KEY: ${MAILSLURP_API_KEY}
     command: >
-      sh -c "mvn test &&
-             allure generate target/allure-results -o target/allure-report --clean"
-
-  report-server:
-    image: nginx:alpine
-    ports:
-      - "8088:80"
-    volumes:
-      - ./target/allure-report:/usr/share/nginx/html:ro
+      sh -c "xvfb-run --auto-servernum --server-args='-screen 0 1920x1080x24' mvn test"
