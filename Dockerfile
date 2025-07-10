@@ -22,4 +22,4 @@ COPY . .
 RUN mvn clean install -DskipTests
 
 # Запуск тестов и генерация отчета
-CMD ["sh", "-c", "mvn test && allure generate target/allure-results -o target/allure-report --clean"]
+CMD ["sh", "-c", "xvfb-run --auto-servernum --server-args='-screen 0 1920x1080x24' mvn test && allure generate target/allure-results -o target/allure-report --clean"]
