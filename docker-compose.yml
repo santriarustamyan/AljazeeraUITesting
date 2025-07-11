@@ -1,4 +1,4 @@
-version: '3.8'
+
 
 services:
   tests:
@@ -9,8 +9,13 @@ services:
     image: aljazeera-tests
     volumes:
       - ./target/allure-results:/app/target/allure-results
+      - ./target/allure-report:/app/target/allure-report
+
     environment:
       MAILSLURP_API_KEY: ${MAILSLURP_API_KEY}
       DOCKER: "true"
     command: >
-      sh -c "xvfb-run --auto-servernum --server-args='-screen 0 1920x1080x24' mvn test"
+      sh -c "
+        xvfb-run --auto-servernum --server-args='-screen 0 1920x1080x24' mvn test &&
+        allure generate target/allure-results -o target/allure-report --clean
+      "

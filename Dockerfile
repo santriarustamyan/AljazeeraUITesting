@@ -36,6 +36,13 @@ RUN wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.d
 ENV CHROME_BIN=/usr/bin/google-chrome
 ENV PATH="$PATH:/usr/local/bin"
 
+# Установка Allure CLI
+RUN wget https://github.com/allure-framework/allure2/releases/download/2.24.1/allure-2.24.1.tgz && \
+    tar -zxvf allure-2.24.1.tgz && \
+    mv allure-2.24.1 /opt/allure && \
+    ln -s /opt/allure/bin/allure /usr/bin/allure && \
+    rm allure-2.24.1.tgz
+
 # Создание рабочей директории
 WORKDIR /app
 
