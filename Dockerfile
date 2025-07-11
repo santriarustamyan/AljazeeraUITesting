@@ -53,4 +53,4 @@ COPY . .
 RUN mvn clean install -DskipTests
 
 # Запуск тестов
-CMD ["sh", "-c", "xvfb-run --auto-servernum --server-args='-screen 0 1920x1080x24' mvn test"]
+CMD ["sh", "-c", "xvfb-run --auto-servernum --server-args='-screen 0 1920x1080x24' mvn test -DsuiteXmlFile=src/test/resources/testng.xml"]
