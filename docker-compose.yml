@@ -37,3 +37,13 @@ services:
     ports:
       # Map container's 8080 -> host's 9090 (to avoid conflict with Jenkins)
       - "9090:8080"
+
+    deploy:
+      resources:
+        limits:
+          memory: 4G
+        reservations:
+          memory: 1G
+
+
+
