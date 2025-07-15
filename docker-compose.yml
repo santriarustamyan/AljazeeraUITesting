@@ -35,5 +35,5 @@ services:
       "
 
     ports:
-      # Access report via http://localhost:8080
-      - "8080:8080"
+      # Map container's 8080 -> host's 9090 (to avoid conflict with Jenkins)
+      - "9090:8080"
