@@ -1,21 +1,39 @@
-
+version: '3.8'
 
 services:
   tests:
     build:
       context: .
       dockerfile: Dockerfile
+    # Force linux/amd64 if needed (useful on ARM Macs)
     platform: linux/amd64
+
     image: aljazeera-tests
+
     volumes:
+      # Cache Maven dependencies between runs (huge speed-up!)
+      - ~/.m2:/root/.m2
+
+      # Save allure results & reports on the host machine
       - ./target/allure-results:/app/target/allure-results
       - ./target/allure-report:/app/target/allure-report
 
     environment:
       MAILSLURP_API_KEY: ${MAILSLURP_API_KEY}
       DOCKER: "true"
+
+    # Command to run inside the container:
+    # 1. Run tests with virtual X server (headless UI)
+    # 2. Generate Allure report
+    # 3. Copy report to nginx and keep it running
     command: >
       sh -c "
         xvfb-run --auto-servernum --server-args='-screen 0 1920x1080x24' mvn test &&
-        allure generate target/allure-results -o target/allure-report --clean
+        allure generate target/allure-results -o target/allure-report --clean &&
+        rm -rf /var/www/html/* && cp -r target/allure-report/* /var/www/html/ &&
+        nginx -g 'daemon off;'
       "
+
+    ports:
+      # Access report via http://localhost:8080
+      - "8080:8080"
