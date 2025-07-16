@@ -1,6 +1,4 @@
 
-
-
 # 1. Base image: Maven + JDK 17
 FROM maven:3.9.4-eclipse-temurin-17
 
