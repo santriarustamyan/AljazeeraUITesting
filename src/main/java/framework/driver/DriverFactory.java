@@ -23,7 +23,9 @@ public class DriverFactory {
      * @return configured WebDriver instance
      */
     public static WebDriver getDriver(String mode) {
+
         if (driver == null) {
+
             WebDriverManager.chromedriver().setup();
 
             ChromeOptions options = new ChromeOptions();
@@ -36,9 +38,13 @@ public class DriverFactory {
             options.addArguments("--disable-popup-blocking");
             options.addArguments("--no-sandbox");
             options.addArguments("--disable-dev-shm-usage");
+            options.addArguments("--disable-gpu");
+            options.addArguments("--remote-allow-origins=*");
 
-            boolean isHeadless = Config.getBoolean("headless");
-
+            boolean isHeadless =
+                    Config.getBoolean("headless") ||
+                            System.getenv("CI") != null ||
+                            System.getenv("JENKINS_HOME") != null;
             if ("mobile".equalsIgnoreCase(mode)) {
                 // Enable mobile emulation
                 Map<String, Object> mobileEmulation = Map.of("deviceName", "iPhone X");
