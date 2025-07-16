@@ -1,3 +1,4 @@
+
 version: '3.8'
 
 services:
@@ -22,26 +23,18 @@ services:
       MAILSLURP_API_KEY: ${MAILSLURP_API_KEY}
       DOCKER: "true"
 
+    # Command to run inside the container:
+    # 1. Run tests with virtual X server (headless UI)
+    # 2. Generate Allure report
+    # 3. Copy report to nginx and keep it running
     command: >
       sh -c "
-        google-chrome --version &&
-        xvfb-run --auto-servernum --server-args='-screen 0 1920x1080x24' google-chrome --headless --disable-gpu --no-sandbox --remote-debugging-port=9222 & sleep 3 &&
-        echo '✅ Chrome started OK' &&
-        xvfb-run --auto-servernum --server-args='-screen 0 1920x1080x24' mvn test -Dsurefire.threadCount=1 &&
-        allure generate target/allure-results -o target/allure-report --clean
+        xvfb-run --auto-servernum --server-args='-screen 0 1920x1080x24' mvn test &&
+        allure generate target/allure-results -o target/allure-report --clean &&
+        rm -rf /var/www/html/* && cp -r target/allure-report/* /var/www/html/ &&
+        nginx -g 'daemon off;'
       "
 
-
     ports:
-      # Map container's 8080 -> host's 9090 (to avoid conflict with Jenkins)
-      - "9090:8080"
-
-    deploy:
-      resources:
-        limits:
-          memory: 4G
-        reservations:
-          memory: 1G
-
-
-
+      # Access report via http://localhost:8080
+      - "8080:8080"
