@@ -1,5 +1,5 @@
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
-<suite name="Full UI Automation Suite">
+<suite name="UI Tests" parallel="classes" thread-count="4">
 
     <test name="All Tests">
         <packages>

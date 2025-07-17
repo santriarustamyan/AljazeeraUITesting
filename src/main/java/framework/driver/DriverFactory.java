@@ -26,7 +26,9 @@ public class DriverFactory {
 
         if (driver == null) {
 
-            WebDriverManager.chromedriver().setup();
+            WebDriverManager.chromedriver()
+                    .driverVersion("138.0.7204.157")
+                    .setup();
 
             ChromeOptions options = new ChromeOptions();
 
@@ -57,6 +59,8 @@ public class DriverFactory {
                 // Desktop mode
                 if (isHeadless) {
                     options.addArguments("--headless=new");
+                    options.addArguments("--disable-gpu");
+                    options.addArguments("--disable-software-rasterizer");
                     options.addArguments("--window-size=1920,1080");
                 } else {
                     options.addArguments("--start-maximized");
