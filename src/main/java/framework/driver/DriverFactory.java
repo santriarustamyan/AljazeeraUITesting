@@ -7,48 +7,35 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
+import java.time.Duration;
 import java.util.Map;
 
-/**
- * Factory class for creating and managing WebDriver instances.
- */
 public class DriverFactory {
 
     private static WebDriver driver;
 
-    /**
-     * Returns a singleton WebDriver instance configured for the given mode.
-     *
-     * @param mode "desktop" or "mobile"
-     * @return configured WebDriver instance
-     */
     public static WebDriver getDriver(String mode) {
 
         if (driver == null) {
 
-            WebDriverManager.chromedriver()
-                    .driverVersion("138.0.7204.157")
-                    .setup();
+            WebDriverManager.chromedriver().setup();
 
             ChromeOptions options = new ChromeOptions();
-
-            // Suppress "Chrome is being controlled by automated software"
-            options.setExperimentalOption("excludeSwitches", new String[]{"enable-automation"});
-            options.setExperimentalOption("useAutomationExtension", false);
 
             options.addArguments("--disable-notifications");
             options.addArguments("--disable-popup-blocking");
             options.addArguments("--no-sandbox");
             options.addArguments("--disable-dev-shm-usage");
             options.addArguments("--disable-gpu");
+            options.addArguments("--disable-software-rasterizer");
             options.addArguments("--remote-allow-origins=*");
 
             boolean isHeadless =
                     Config.getBoolean("headless") ||
                             System.getenv("CI") != null ||
                             System.getenv("JENKINS_HOME") != null;
+
             if ("mobile".equalsIgnoreCase(mode)) {
-                // Enable mobile emulation
                 Map<String, Object> mobileEmulation = Map.of("deviceName", "iPhone X");
                 options.setExperimentalOption("mobileEmulation", mobileEmulation);
 
@@ -56,11 +43,8 @@ public class DriverFactory {
                     options.addArguments("--headless=new");
                 }
             } else {
-                // Desktop mode
                 if (isHeadless) {
                     options.addArguments("--headless=new");
-                    options.addArguments("--disable-gpu");
-                    options.addArguments("--disable-software-rasterizer");
                     options.addArguments("--window-size=1920,1080");
                 } else {
                     options.addArguments("--start-maximized");
@@ -69,7 +53,8 @@ public class DriverFactory {
 
             driver = new ChromeDriver(options);
 
-            // Adjust window size if needed
+            driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+
             if (!isHeadless && !"mobile".equalsIgnoreCase(mode)) {
                 driver.manage().window().maximize();
             } else if (!"mobile".equalsIgnoreCase(mode)) {
@@ -80,9 +65,6 @@ public class DriverFactory {
         return driver;
     }
 
-    /**
-     * Quits the WebDriver and cleans up the instance.
-     */
     public static void quitDriver() {
         if (driver != null) {
             driver.quit();
