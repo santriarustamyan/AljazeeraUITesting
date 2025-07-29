@@ -19,6 +19,7 @@ public class HomePage extends BasePage {
      * Top navigation main menu items
      */
     public enum MainMenu {
+        MENU_FOR_MOBILE("//*[@aria-label='Show navigation menu']"),
         NEWS("//a[@href='/news/']"),
         MIDDLE_EAST("//a[@href='/middle-east/']"),
         EXPLAINED("//a[@href='/tag/explainer/']"),

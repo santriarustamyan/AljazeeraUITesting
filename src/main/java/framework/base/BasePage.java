@@ -223,6 +223,7 @@ public abstract class BasePage {
     public void scrollToBottom() {
         ((JavascriptExecutor) driver).executeScript("window.scrollTo(0, document.body.scrollHeight);");
     }
+
     /**
      * Waits until the page title is not empty.
      */
@@ -232,6 +233,33 @@ public abstract class BasePage {
                     String title = d.getTitle();
                     return title != null && !title.trim().isEmpty();
                 });
+    }
+
+    /**
+     * Returns the specified attribute value of the given element.
+     * Waits for the element to be visible before accessing the attribute.
+     */
+    public String getAttribute(By locator, String attribute) {
+        return waitForVisibility(locator).getAttribute(attribute);
+    }
+
+    /**
+     * Closes a popup or reading list banner if it's present on the page.
+     * If the popup is not present, does nothing.
+     */
+    public void closeReadingListPopupIfPresent(By popUpCloseBtnLocator) {
+        try {
+            WebElement closeButton = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                    popUpCloseBtnLocator
+            ));
+            if (closeButton.isDisplayed()) {
+                closeButton.click();
+
+                wait.until(ExpectedConditions.invisibilityOfElementLocated(popUpCloseBtnLocator
+                ));
+            }
+        } catch (TimeoutException | NoSuchElementException ignored) {
+        }
     }
 
 }
